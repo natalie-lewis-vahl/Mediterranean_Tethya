@@ -124,10 +124,10 @@ summary.rad.htest<-function (x, ...)
 ###########################
 
 #bactLoadCorrectedCountsPath<-"../Data/cbas_tempVSctrl.otutab.bactloadCorrected_valuesOnly.csv"
-uncorrectedCountsPath<-"../Data/cbas_tempVSctrl.otutab.csv"
-otuTaxonomyPath<-"../Data/cbas_otu_taxonomy.csv"
+uncorrectedCountsPath<-"./Data/all.otutab_raw.csv"
+otuTaxonomyPath<-"./Data/all_taxa.csv"
 
-plotsPath<-"../Plots/"
+plotsPath<-"./Figures/"
 
 ################
 #User defined variables
@@ -141,29 +141,44 @@ plotPDF<-FALSE
 ###########################
 
 countsDF<-read.csv(uncorrectedCountsPath, sep="\t")
-otuTaxonomy<-read.csv(otuTaxonomyPath, sep="\t")
+otuTaxonomy<-read.csv(otuTaxonomyPath, sep=";")
 
 #get OTU counts and add them to DF
 countSum<-apply(countsDF[-1],1,sum)
 countsDF<-cbind(countsDF, countSum)
 
+#Make cumulative percentage to filter out OTUs which make up less than the 5% cummulative sample count
+pct<-countSum/sum(countSum)
+
+countsDF<-cbind(countsDF, pct)
+countsDF<-countsDF%>%
+  mutate(cumpct=cumsum(pct))
+dim(countsDF)
 #bind the taxonomy columns to the otu counts DF
 countsWithTaxonomy<-bind_cols(countsDF[order(countsDF$X.OTU.ID),], otuTaxonomy[order(otuTaxonomy$sequence_identifier),])
+# AND for NOT Getting rid of "unclassified" phylums
+countsWithTaxonomy[countsWithTaxonomy==""]<-"Unclassified"
+#Filter up to 95 % additive abundance
+countsWithTaxonomy<-countsWithTaxonomy[countsWithTaxonomy$cumpct < 0.95,]
+dim(countsWithTaxonomy)
+#delete both columns again
+countsWithTaxonomy=select(countsWithTaxonomy,-c(cumpct,pct))
 
 #remove OTUs with sum zero if any. Uncomment dim lines if check wanted.
 #dim(countsWithTaxonomy)
 countsWithTaxonomy<-countsWithTaxonomy[countsWithTaxonomy$countSum != 0,]
 #dim(countsWithTaxonomy)
 
-
 # Phylum abundance per sample
-abundanceByPhylumBySample<-countsWithTaxonomy %>% group_by(Phylum) %>% filter(Phylum != "") %>% mutate_at(colnames(countsWithTaxonomy)[2:21],sum) %>% distinct_at(vars(colnames(countsWithTaxonomy)[c(2:21,25)])) 
+# AND NOT Getting rid of "unclassified" phylums
+#AND Getting rid of "unclassified" phylums if they were left as blanks
+abundanceByPhylumBySample<-countsWithTaxonomy %>% group_by(Phylum) %>% filter(Phylum != "") %>% mutate_at(colnames(countsWithTaxonomy)[2:22],sum) %>% distinct_at(vars(colnames(countsWithTaxonomy)[c(2:22,26)])) 
 
 #########################
 #Fit rank-abundance dominance models with phylum data
 ###########################################
 
-phylumRAD<-radfit(t(as.data.frame(abundanceByPhylumBySample)[,1:20]))
+phylumRAD<-radfit(t(as.data.frame(abundanceByPhylumBySample)[,1:21]))
 summary(phylumRAD)
 phylumRADPlot<-plot(phylumRAD)
 
@@ -195,7 +210,7 @@ plot.rad.test(phylumRAD_test, "post.hoc")
 #####################################
 #rank-abundance dominance with OTU data
 ##########################################################
-otuRAD<-radfit(t(countsWithTaxonomy[(countsWithTaxonomy$Phylum != ""),c(2:21)]))
+otuRAD<-radfit(t(countsWithTaxonomy[(countsWithTaxonomy$Phylum != ""),c(2:22)]))
 
 summary(otuRAD)
 otuRADPlot<-plot(otuRAD)
