@@ -47,13 +47,13 @@ active_otus <- names(otu_samples[otu_samples > 10])
 
 
 require(igraph)
-vs <- unique(otu_table$sponge)
+vs <- unique(otu_table$Sample)
 g_whole <- graph.empty() + vertices(vs)
 
 
 for(v in vs){
   print(v)
-  cur_samps <- which(otu_table$sponge == v)
+  cur_samps <- which(otu_table$Sample == v)
   replicates <- otu_table[cur_samps, ]
   replicates <- replicates[,grep('OTU', names(replicates))]
   #   replicates[replicates >= 1] <- 1
