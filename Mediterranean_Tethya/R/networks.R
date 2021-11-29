@@ -1,5 +1,7 @@
 library(dplyr)
 library(tibble)
+library(igraph)
+library(network)
 CountsPath<-"./Data/all.otutab_raw.csv"
 otuTaxonomyPath<-"./Data/all_taxa.csv"
 
@@ -151,9 +153,9 @@ E(g)[ as.vector(e_edges)[e_top_weights] ]
 otus_in_network <- V(g_whole)$name[! V(g_whole)$name %in% vs]
 x <- degree(g_whole, v=otus_in_network)
 
-specialists <- names(x[x<2])
+specialists <- names(x[x<5])
 opportunists <- names(x[which(x>=2 & x<=2)])
-generalists <- names(x[x>2])
+generalists <- names(x[x>5])
 
 total_abs <- colSums(replicates)
 

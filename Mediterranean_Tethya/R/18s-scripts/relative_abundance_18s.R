@@ -3,6 +3,7 @@ library(RColorBrewer)
 library(dplyr)
 library(vegan)
 library(reshape2)
+library(tidyr)
 #ENter data and order the data frames
 taxa<-read.csv("./Data/18s/taxa_fixed18s.csv",sep=",")
 unique(taxa$Phylum)
@@ -43,8 +44,8 @@ head(oat)
 #FInd which rows to delete
 which(oat$X.OTU.ID=="OTU_1")
 which(oat$X.OTU.ID=="OTU_2")
-dim(xotu_and_taxa)
-#Delete row 1 and 95
+dim(oat)
+#Delete row 1 and 85
 oat<-oat[-c(1,85),]
 oat[oat==""]<-"Unclassified"
 #Find last sample column
@@ -139,10 +140,37 @@ ggsave("Freq_of_otu.jpg",path=plotsPath)
 
 botu_count<-otucount[(otucount$Phylum!="Unclassified"),]
 
-ggplot(botu_count, aes(x=Numb_otu,y=Phylum))+geom_col(fill=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,Chordata,
+ggplot(botu_count, aes(y=Numb_otu,x=Phylum))+geom_col(fill=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,Chordata,
                                                            Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
                                                            Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                                            Rhodophyta))+labs(x="Number of OTUs",y="Phylum")+theme_bw()
+str(oatmelt)
+#Make each variable (sample names) a level
+levels(oatmelt$variable)<-c("GW1941","GW1942" ,"GW1943","GW1944", "GW1945", "GW1946", "GW1947", "GW1948","GW1949","GW1950","GW1951",
+                            "GW1952", "GW1953", "GW1954", "GW1955","GW1956", "GW1957", "GW1958", "GW1959","GW1960","GW1961","GW1962",
+                            "GW1963","GW1964","GW1965","GW1966", "GW1967", "GW1968", "GW1969", "GW1970", "GW1971","GW1972","GW1973","GW1974", "GW1975","GW1976", "GW1977", "GW1978","GW1979", "GW1980", "GW1981", "GW1982", "GW1983", "GW1984")
+#Assign species names to each sample via the levels
+levels(oatmelt$variable)<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau",
+                            "Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme",
+                            "Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci")
+
+####Group by phylum and also species
+botucount<-oatmelt%>%
+  group_by(Phylum,variable)%>%
+  summarise(Numb_otu=n())%>%
+  spread(variable,Numb_otu)%>%
+  ungroup()
+
+#  summarise(tau_Numb_otu=n[variable=="Tau"],tme_Numb_otu=n[variable=="Tme"],Tci_Numb_otu=n[variable=="Tci"])
+
+botu_count<-botucount[(botucount$Phylum!="Unclassified"),]
+
+ggplot(botu_count)+
+  geom_bar(aes(x=Phylum,fill=c(Tau,Tme,Tci)),position = position_dodge(preserve="single"))+
+  geom_col(fill=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,Chordata,
+                                                             Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
+                                                             Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
+                                                             Rhodophyta))+labs(x="Number of OTUs",y="Phylum")+theme_bw()
 ggsave("Freq_of_otu_wo_unclass.jpg",path=plotsPath)
 
 #BUbble plot for comparing, richness and abundance of phylums across species

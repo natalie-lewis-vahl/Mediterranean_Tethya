@@ -65,7 +65,7 @@ presentOTU<-function(x){
 uncorrectedCountsPath<-"./Data/all.otutab_raw.csv"
 otuTaxonomyPath<-"./Data/all_taxa.csv"
 
-plotsPath<-"./Figures/richnessAndAbundanceByPhylumAndSample/"
+plotsPath<-"./Figures/16splots_2/"
 
 ################
 #User defined variables
@@ -126,9 +126,6 @@ allBacteriaColorVector<-c(AcidobacteriotaCol,ActinobacteriotaCol,BacteroidotaCol
                           UnclassifiedCol,VerrucomicrobiotaCol,WPS2Col,WS1Col)
 #################
 
-plotSVG<-TRUE
-plotPDF<-FALSE
-
 ################
 #Main Source
 ###########################
@@ -175,23 +172,11 @@ levels(otuCountByPhylumBySampleMelted$variable)<-c("GW1941","GW1942","GW1944","G
 
 richnessByPhylumBySampleBarPlot<-ggplot(otuCountByPhylumBySampleMelted, aes(x=variable, y=value)) + geom_bar(position = "stack", stat="identity", aes(fill=Phylum)) + scale_fill_manual(values = allBacteriaColorVector) + theme_bw() + theme(axis.text.x=element_text(angle=90, hjust=1))+labs(xlab="Species sample",ylab="Number of different OTU's per phylum")
 
-if(plotPDF){
-  
-  richnessByPhylumBySampleBarPlotPath<-paste(plotsPath,"richnessByPhylumBySampleBarPlot.pdf",sep="")
-  pdf(richnessByPhylumBySampleBarPlotPath)
-  print(richnessByPhylumBySampleBarPlot)
-  dev.off()
-  
-}
+#save as jpeg image
+jpeg(file="./Figures/16splots_2/richnessByPhylumBySampleBarPlot.jpeg", units="in", width=10, height=5, res=300)
+richnessByPhylumBySampleBarPlot
+dev.off()
 
-if(plotSVG){
-  
-  richnessByPhylumBySampleBarPlotPath<-paste(plotsPath,"richnessByPhylumBySampleBarPlot.svg",sep="")
-  svg(richnessByPhylumBySampleBarPlotPath)
-  print(richnessByPhylumBySampleBarPlot)
-  dev.off()
-  
-}
 
 ########WITHOUT UNCLASSIFIED ####
 #turn abundance into richness and count otus by phylum, melt and plot if required (TOOK OUT FILTER FOR UNCLASSIFIED %>% filter(Phylum != ""))
@@ -203,24 +188,10 @@ levels(xotuCountByPhylumBySampleMelted$variable)<-c("GW1941","GW1942","GW1944","
 
 xrichnessByPhylumBySampleBarPlot<-ggplot(xotuCountByPhylumBySampleMelted, aes(x=variable, y=value)) + geom_bar(position = "stack", stat="identity", aes(fill=Phylum)) + scale_fill_manual(values = allBacteriaColorVector) + theme_bw() + theme(axis.text.x=element_text(angle=90, hjust=1))+labs(xlab="Species sample",ylab="Number of different OTU's per phylum")
 
-if(plotPDF){
-  
-  xrichnessByPhylumBySampleBarPlotPath<-paste(plotsPath,"xrichnessByPhylumBySampleBarPlot.pdf",sep="")
-  pdf(xrichnessByPhylumBySampleBarPlotPath)
-  print(xrichnessByPhylumBySampleBarPlot)
-  dev.off()
-  
-}
-
-if(plotSVG){
-  
-  xrichnessByPhylumBySampleBarPlotPath<-paste(plotsPath,"xrichnessByPhylumBySampleBarPlot.svg",sep="")
-  svg(xrichnessByPhylumBySampleBarPlotPath)
-  print(xrichnessByPhylumBySampleBarPlot)
-  dev.off()
-  
-}
-
+#Save image
+jpeg(file="./Figures/16splots_2/xrichnessByPhylumBySampleBarPlot.jpeg", units="in", width=10, height=5, res=300)
+xrichnessByPhylumBySampleBarPlotPath
+dev.off()
 ####################################
 #
 # Abundance per Phylum per sample plots
@@ -234,24 +205,6 @@ xabundanceByPhylumBySampleMelted<-melt(xabundanceByPhylumBySample)
 levels(xabundanceByPhylumBySampleMelted$variable)<-c("GW1941","GW1942","GW1944","GW1945","GW1946","GW1947","GW1948","GW1952","GW1953","GW1954","GW1955","GW1957","GW1958","GW1959","GW1964","GW1967","GW1968","GW1969","GW1973","GW1979","GW1982")
 
 xabundanceByPhylumBySampleBarPlot<-ggplot(xabundanceByPhylumBySampleMelted, aes(x=variable, y=value)) + geom_bar(position = "stack", stat="identity", aes(fill=Phylum)) + scale_fill_manual(values = allBacteriaColorVector) + theme_bw()  + theme(axis.text.x=element_text(angle=90, hjust=1))+labs(xlab="Species sample",ylab="Relative abundance of OTU's across phyla per sample")
-
-
-if(plotPDF){
-  
-  xabundanceByPhylumBySampleBarPlotPath<-paste(plotsPath,"xabundanceByPhylumBySampleBarPlot.pdf",sep="")
-  pdf(xabundanceByPhylumBySampleBarPlotPath)
-  print(xabundanceByPhylumBySampleBarPlot)
-  dev.off()
-  
-}
-
-if(plotSVG){
-  
-  xabundanceByPhylumBySampleBarPlotPath<-paste(plotsPath,"xabundanceByPhylumBySampleBarPlot.svg",sep="")
-  svg(xabundanceByPhylumBySampleBarPlotPath)
-  print(xabundanceByPhylumBySampleBarPlot)
-  dev.off()
-  
-}
+jpeg(file="./Figures/16splots_2/xabundanceByPhylumBySampleBarPlot.jpeg", units="in", width=10, height=5, res=300)
 
 #EOF
