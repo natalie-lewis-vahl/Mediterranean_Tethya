@@ -8,6 +8,9 @@ otuTaxonomyPath<-"./Data/all_taxa.csv"
 
 otutable<-read.csv(CountsPath, sep="\t")
 taxatable<-read.csv(otuTaxonomyPath, sep=";")
+#reorder otu to match taxa
+#reorder_id<-match(taxatable$sequence_identifier,otutable$X.OTU.ID)
+#otutable<-otutable[reorder_id,]
 
 #get OTU counts and add them to DF
 countSum<-apply(otutable[-1],1,sum)

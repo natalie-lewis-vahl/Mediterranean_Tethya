@@ -164,13 +164,13 @@ botucount<-oatmelt%>%
 #  summarise(tau_Numb_otu=n[variable=="Tau"],tme_Numb_otu=n[variable=="Tme"],Tci_Numb_otu=n[variable=="Tci"])
 
 botu_count<-botucount[(botucount$Phylum!="Unclassified"),]
-
+###HEREEEE
 ggplot(botu_count)+
-  geom_bar(aes(x=Phylum,fill=c(Tau,Tme,Tci)),position = position_dodge(preserve="single"))+
+  geom_bar(aes(y=value,fill=c(Tau,Tme,Tci))+
   geom_col(fill=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,Chordata,
-                                                             Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
-                                                             Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
-                                                             Rhodophyta))+labs(x="Number of OTUs",y="Phylum")+theme_bw()
+  Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
+  Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
+  Rhodophyta))+labs(x="Number of OTUs",y="Phylum")+theme_bw()
 ggsave("Freq_of_otu_wo_unclass.jpg",path=plotsPath)
 
 #BUbble plot for comparing, richness and abundance of phylums across species
