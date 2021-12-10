@@ -39,14 +39,15 @@ label_groups<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau
 #creeate plot and delete columns with cumpct, pct and cumsum
 nmds<-metaMDS(t(bact_matrix[,-c(45:47)]), try=50)
 
-#With filtered data get Warning message: stress is (nearly) zero: you may have insufficient data
+#With previous incomplete data set got filtered data get Warning message: stress is (nearly) zero: you may have insufficient data
+tiff("./Figures/AS_16splots/nmdsplot_16s.tiff",height=20,width=20,units="cm",res=300)
 
 plot(nmds, type = "t", display="sites")
 
 points(nmds, col=num_groups, cex=1.5, pch=16)
 
 ordispider(nmds, label_groups, label=T)
-
+dev.off()
 #anosim(t(bact_matrix), num_groups)
 
 #vector 
@@ -60,37 +61,66 @@ species_vector<-data.frame(Species=c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","
 ??cca
 bact_cca<-cca(t(bact_matrix[,-c(45:47)])~Species, data=species_vector)
 #bact_cca<-cca(t(bact_matrix[-c(17,18)])~Condition+Sponge_type+Condition:Sponge_type, data=temp_treatments)
+tiff("./Figures/AS_16splots/ccaplot_16s.tiff",height=20,width=20,units="cm",res=300)
 
 plot(bact_cca, type="t", display="sites")
 points(bact_cca, col=num_groups, cex=1.5, pch=16)
 ordispider(bact_cca, label_groups, label=T)
+dev.off()
 summary(bact_cca)
 anova(bact_cca)
 anova(bact_cca, by="term")
 
 anova(bact_cca, by="margin")
 
-#cca with all core species inclusive (core of any of the species).
+#cca with all core species inclusive (defined in AS_NLcoreCommunity script as present
+#in 90% of samples of any one of the species).
 coreOTUs<-c("OTU_1058", "OTU_11","OTU_124","OTU_132","OTU_19", "OTU_21", "OTU_242", "OTU_25","OTU_27","OTU_36", "OTU_360", "OTU_43","OTU_455",
             "OTU_52","OTU_54","OTU_65","OTU_73","OTU_75","OTU_77","OTU_888","OTU_9","OTU_90","OTU_91","OTU_96")
 coreOnlyCounts<-bact_matrix[rownames(bact_matrix[,-c(45:47)]) %in% as.character(coreOTUs),-c(45:47)]
+#creeate plot and delete columns with cumpct, pct and cumsum
+corenmds<-metaMDS(t(bact_matrix[rownames(bact_matrix[,-c(45:47)]) %in% as.character(coreOTUs),-c(45:47)]))
+
+#With previous incomplete data set got filtered data get Warning message: stress is (nearly) zero: you may have insufficient data
+tiff("./Figures/AS_16splots/nmdsplot_core16s.tiff",height=20,width=20,units="cm",res=300)
+
+plot(corenmds, type = "t", display="sites")
+
+points(corenmds, col=num_groups, cex=1.5, pch=16)
+
+ordispider(corenmds, label_groups, label=T)
+dev.off()
+#cca plot
 core_cca<-cca(t(coreOnlyCounts)~Species, data=species_vector)#correspondence analysis,
+
+tiff("./Figures/AS_16splots/ccaplot_core16s.tiff",height=20,width=20,units="cm",res=300)
 plot(core_cca, type="t", display="sites")
 points(core_cca, col=num_groups, cex=1.5, pch=16)
 ordispider(core_cca, label_groups, label=T)
-
+dev.off()
 anova(core_cca)
 
+#non-core community OTUs (those not included in the all core species in any species)
+#nmds
+noncorenmds<-metaMDS(t(bact_matrix[!(rownames(bact_matrix[,-c(45:47)]) %in% as.character(coreOTUs)),-c(45:47)]))
 
+#With previous incomplete data set got filtered data get Warning message: stress is (nearly) zero: you may have insufficient data
+tiff("./Figures/AS_16splots/nmdsplot_noncore16s.tiff",height=20,width=20,units="cm",res=300)
 
-#cca with non-core community OTUs (those not included in the all core species in any species)
+plot(noncorenmds, type = "t", display="sites")
+
+points(noncorenmds, col=num_groups, cex=1.5, pch=16)
+
+ordispider(noncorenmds, label_groups, label=T)
+dev.off()
+#cca
 nonCoreCounts<-bact_matrix[!(rownames(bact_matrix[,-c(45:47)]) %in% as.character(coreOTUs)),-c(45:47)]
 nonCore_cca<-cca(t(nonCoreCounts)~Species, data=species_vector)
-
+tiff("./Figures/AS_16splots/ccaplot_noncore16s.tiff",height=20,width=20,units="cm",res=300)
 plot(nonCore_cca, type="t", display="sites")
 points(nonCore_cca, col=num_groups, cex=1.5, pch=16)
 ordispider(nonCore_cca, label_groups, label=T)
-
+dev.off()
 anova(nonCore_cca)
 
 

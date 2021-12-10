@@ -155,9 +155,11 @@ xdatamelt<-datamelt%>%
   group_by(variable)%>%
   summarise(relative_abundance=value/sum(value))
 dim(xdatamelt)
-head(xdatamelt)
+View(datamelt)
 #Bind the "relative_abundance" col (for each sp seperately) to the main data set
 dataset<-cbind(datamelt,xdatamelt[2])
+#creates a bunch of 0 values because creates a category for every OTU and sp
+
 
 #DAta with just the core OTUs and also with just non core OTUs
 ##core
@@ -200,6 +202,7 @@ xnoncoredatamelt<-noncoredatamelt%>%
   summarise(relative_abundance=value/sum(value))
 #Bind the "relative_abundance" col (for each sp seperately) to the main data set
 noncoredataset<-cbind(noncoredatamelt,xnoncoredatamelt[2])
+
 ##########
 
 unique(dataset$Phylum)
@@ -344,5 +347,5 @@ ggplot(mcore_otu, aes(X.OTU.ID, y=value)) + geom_bar(aes(fill=Phylum), stat="ide
   theme(axis.text.x=element_text(angle=90,hjust=1))
 dev.off()
 
-
+#continues into AS_NLbubbleplots.R
 
