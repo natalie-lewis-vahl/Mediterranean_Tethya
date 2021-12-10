@@ -27,21 +27,20 @@ UnclassifiedCol<-"#d9d9d9"
 
 uncorrectedCountsPath<-"./Data/all.otutab_raw.csv"
 #tbc bactLoadCorrectedCountsPath<-"./Data/all.otutab_Corrected_valuesOnly.csv"
-otuTaxonomyPath<-"./Data/all_taxa.csv"
+otuTaxonomyPath<-"./Data/all_taxataxa.csv"
 
-otuTaxonomy<-read.csv(otuTaxonomyPath, sep=";")
-
+otuTaxonomy<-read.csv(otuTaxonomyPath, sep="\t")
 countsDF<-read.csv(uncorrectedCountsPath, sep="\t")
-head(countsDF)
+head(otuTaxonomy)
 data<-cbind(countsDF[order(countsDF$X.OTU.ID),],otuTaxonomy[order(otuTaxonomy$sequence_identifier),])
 head(data)
-
+unique(data$Phylum)
 #CAlculate pct abundance to filter out the last 5% 
 countSum<-apply(countsDF[2:22],1,sum) #sum the rows
 pct<-countSum/sum(countSum)
 
 xdata<-cbind(data, pct)
-xdata[desc(xdata$pct),]
+xdata<-xdata[desc(xdata$pct),]
 xdata<-xdata%>%
   mutate(cumpct=cumsum(pct))
 

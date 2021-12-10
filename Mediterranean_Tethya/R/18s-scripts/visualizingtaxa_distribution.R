@@ -56,3 +56,6 @@ length(which(filtered$Class=="Heterotrichea"))
 unique(filtered$Order[filtered$Class=="Spirotrichea"])       
 
 length(which(filtered$Order=="Sporadotrichida"))
+
+length(which(!filtered$Phylum=="Unclassified"))
+
