@@ -13,12 +13,15 @@ otu_and_taxa<-otu_and_taxa%>%filter(Domain!="Bacteria")
 #Take out OTU 1 for coral amplification
 otus_and_taxa<-otu_and_taxa[!(otu_and_taxa$X.OTU.ID=="OTU_1"),]
 #Uncomment to also take out OTU 2
-otus_and_taxa<-otu_and_taxa[!(otu_and_taxa$X.OTU.ID=="OTU_1"|otu_and_taxa$X.OTU.ID=="OTU_2"),]
-
+otus_and_taxa<-otu_and_taxa[!(otu_and_taxa$X.OTU.ID=="OTU_2"),]
+head(otus_and_taxa)
 #Remove OTUS with less than 5 reads
-otus_and_taxa<-otus_and_taxa[otus_and_taxa$size>4,]
+countSum<-apply(otus_and_taxa[2:45],1,sum)
+otus_and_taxa<-cbind(otus_and_taxa,countSum)
+#same thing as using size column from taxa dataset
+otus_and_taxa<-otus_and_taxa[otus_and_taxa$countSum>18,]
 
-d18s_matrix<-otus_and_taxa[,-c(46:56)]
+d18s_matrix<-otus_and_taxa[,-c(46:57)]
 #rEMOVE SEQUENCE id AS A COLUMN AND MAKE THEM THE ROW NAMES
 row.names(d18s_matrix)<-d18s_matrix$X.OTU.ID
 #remove column with id names and taxa columns again
@@ -64,6 +67,7 @@ hist(x)
 x
 x$statistic
 hist(x$perm)
+abline(v=x$statistic)
 #vector 
 species_vector<-data.frame(Species=c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci"))
 

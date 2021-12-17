@@ -104,7 +104,7 @@ head(countsDF)
 cat<-bind_cols(countsDF[order(countsDF$X.OTU.ID),], taxa[order(taxa$sequence_identifier),])
 head(cat)
 #FIlter out unnecessary data
-##OR get rid of reads less than 3
+##OR get rid of reads less than 5
 cat<-cat[cat$countSum>5,]
 
 #FIlter out bacteria
