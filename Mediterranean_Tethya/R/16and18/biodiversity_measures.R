@@ -1,6 +1,8 @@
 #Alpha, beta and gamma
 library(matrixStats)
 library(dplyr)
+library(vegan)
+library(ggplot2)
 taotus<-read.csv("./Data/16and18s_otu.csv", sep=";")
 otus<-arrange(taotus, X.OTU.ID)
 #BInd taxonomy to remove bacterial OTUs from 18s dataset 
@@ -49,4 +51,138 @@ data_18<-data_18[,-45]
 data_16
 nrow(data_16)
 #404 is gamma diversity = in all sponge samples
-sapply(data_16)
+g_persample<-apply(data_16,2,sum)
+g_persample<-as.matrix(g_persample)
+meang_persample<-apply(g_persample,2,mean)
+
+beta<-nrow(data_16)/meang_persample
+beta
+#2.435 higher differentiation between samples
+data_18
+nrow(data_18)
+#404 is gamma diversity = in all sponge samples
+g_persample18<-apply(data_18,2,sum)
+g_persample18<-as.matrix(g_persample18)
+meang_persample18<-apply(g_persample18,2,mean)
+
+beta18<-nrow(data_18)/meang_persample18
+beta18
+#18s data much more differentiated
+
+###Make graphs for Alpha diversity
+#Turn tables back to counts before they were made into logical
+data_all<-otus_and_taxab
+#just 16s
+data_16<-data_all[data_all$dataset=="16s",]
+data_16<-data_16[,-c(1,2,47:55)]
+#just 18s
+data_18<-data_all[data_all$dataset=="18s",]
+data_18<-data_18[,-c(1,2,47:55)]
+#Code taken from RPubs Ecological Diversity Dr. Ro Allen M.Res. Marine Biology 2019
+data_16<-as.matrix(t(data_16))
+H<-diversity(data_16)
+richness<-specnumber(data_16)
+species<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci")
+evenness<-H/log(richness)#Peilous richness
+alpha<-cbind(shannon=H, richness=richness, pielou=evenness,species)
+alpha<-as.data.frame(alpha)
+str(alpha)
+alpha$shannon<-as.numeric(alpha$shannon)
+alpha$richness<-as.numeric(alpha$richness)
+alpha$pielou<-as.numeric(alpha$pielou)
+
+shanplot16<-ggplot(alpha,aes(species,shannon,colour=species))+
+  geom_point()+
+  ylab("Shannon's H'") + 
+  xlab("" )+
+  theme_bw() +
+  theme(legend.position = "none")+
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+richplot16<-ggplot(alpha,aes(species,richness,colour=species))+
+  geom_point()+
+  ylab("Species richness") + 
+  xlab("" )+
+  theme_bw() +
+  theme(legend.position = "none")+
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+pielouplot16<-ggplot(alpha,aes(species,pielou,colour=species))+
+  geom_point()+
+  ylab("Pielou's evenness") + 
+  xlab("" )+
+  theme_bw() +
+  theme(legend.position = "none")+
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+library(cowplot)
+plot_grid(shanplot16,richplot16,pielouplot16,ncol=3)
+
+#For 18s data
+data_18<-as.matrix(t(data_18))
+
+H18<-diversity(data_18)
+richness18<-specnumber(data_18)
+species<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci")
+evenness18<-H18/log(richness18)#Peilous richness
+alpha18<-cbind(shannon=H18, richness=richness18, pielou=evenness18,species)
+alpha18<-as.data.frame(alpha18)
+alpha18$shannon<-as.numeric(alpha18$shannon)
+alpha18$richness<-as.numeric(alpha18$richness)
+alpha18$pielou<-as.numeric(alpha18$pielou)
+
+shanplot18<-ggplot(alpha18,aes(species,shannon,colour=species))+
+  geom_point()+
+  ylab("Shannon's H'") + 
+  xlab("" )+
+  theme_bw() +
+  theme(legend.position = "none")+
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+richplot18<-ggplot(alpha18,aes(species,richness,colour=species))+
+  geom_point()+
+  ylab("Species richness") + 
+  xlab("" )+
+  theme_bw() +
+  theme(legend.position = "none")+
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+pielouplot18<-ggplot(alpha18,aes(species,pielou,colour=species))+
+  geom_point()+
+  ylab("Pielou's evenness") + 
+  xlab("" )+
+  theme_bw() +
+  theme(legend.position = "none")+
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+plot_grid(shanplot18,richplot18,pielouplot18,ncol=3)
+
+####For 18 and 16 merged
+data_all<-t(otus_and_taxab[,-c(1:2,47:55)])
+
+Hb<-diversity(data_all)
+richnessb<-specnumber(data_all)
+species<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci")
+evennessb<-Hb/log(richnessb)#Peilous richness
+alphab<-cbind(shannon=Hb, richness=richnessb, pielou=evennessb,species)
+alphab<-as.data.frame(alphab)
+alphab$shannon<-as.numeric(alphab$shannon)
+alphab$richness<-as.numeric(alphab$richness)
+alphab$pielou<-as.numeric(alphab$pielou)
+
+shanplotb<-ggplot(alphab,aes(species,shannon,colour=species))+
+  geom_point()+
+  ylab("Shannon's H'") + 
+  xlab("" )+
+  theme_bw() +
+  theme(legend.position = "none")+
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+richplotb<-ggplot(alphab,aes(species,richness,colour=species))+
+  geom_point()+
+  ylab("Species richness") + 
+  xlab("" )+
+  theme_bw() +
+  theme(legend.position = "none")+
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+pielouplotb<-ggplot(alphab,aes(species,pielou,colour=species))+
+  geom_point()+
+  ylab("Pielou's evenness") + 
+  xlab("" )+
+  theme_bw() +
+  theme(legend.position = "none")+
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+plot_grid(shanplotb,richplotb,pielouplotb,ncol=3)
