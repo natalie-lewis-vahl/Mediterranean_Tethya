@@ -22,7 +22,8 @@ head(otuTaxonomy)
 data<-cbind(countsDF[order(countsDF$X.OTU.ID),],otuTaxonomy[order(otuTaxonomy$sequence_identifier),])
 head(data)
 unique(data$Phylum)
-#CAlculate pct abundance to filter out the last 5% 
+#If  you want to filter up to 95% abuncance 
+#Alculate pct abundance to filter out the last 5% 
 countSum<-apply(countsDF[2:45],1,sum) #sum the rows
 pct<-countSum/sum(countSum)
 

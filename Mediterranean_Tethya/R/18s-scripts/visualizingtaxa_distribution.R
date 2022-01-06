@@ -1,6 +1,6 @@
 library(dplyr)
 library(ggplot2)
-taxa<-read.table("./Data/18s/taxa_fixed18s.csv",header=TRUE,sep=";")
+taxa<-read.table("./Data/18s/taxa_fixed18s.csv",header=TRUE,sep=",")
 otus<-read.table("./Data/18s/all.otutab.csv",sep="\t")
 names(taxa)
 names(otus)
@@ -11,7 +11,7 @@ merged<-merge(taxa,otus,by.x="sequence_identifier",by.y="V1")
 str(merged)
 dim(merged)
 xmerged<-merged[!(merged$Domain=="Bacteria"),]
-count<-apply(xmerged[-c(1:8)],1,sum)
+count<-apply(xmerged[-c(1:11)],1,sum)
 xmerged<-cbind(xmerged,count)
 #Uncomment to also take out OTU 1 and 2
 xfiltered<-xmerged[!(xmerged$sequence_identifier=="OTU_1"|xmerged$sequence_identifier=="OTU_2"),]

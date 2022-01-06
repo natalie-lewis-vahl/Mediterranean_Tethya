@@ -89,13 +89,6 @@ plotsPath<-"./Figures/AS_16splots/"
 
 
 ################
-#User defined variables
-###########################
-
-plotSVG<-FALSE
-plotPNG<-TRUE
-
-################
 
 #get OTU counts and add them to DF
 countSum<-apply(otus[-1],1,sum)
@@ -186,7 +179,7 @@ s44tciphylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,44]))
 
 #############
 #Plot everything together
-png("Figures/AS_16splots/AS16s_phylumrad_grouped.png")
+tiff("Figures/AS_16splots/AS16s_phylumrad_grouped.tiff",width=40,height=30,units="cm",res=300)
 par(mfrow=c(3,4))
 #For sp 1
 max(s4tauphylumRAD$y)#Maximum for y is 24556
@@ -218,18 +211,6 @@ plot(s5tauphylumRAD,pch=1,lty=1,col=11,ylim=c(1,25000),xlim=c(0,30))
 mtext(side=3,"Lognormal",cex=1)
 
 #For sp 2
-plot(s16tmephylumRAD,pch=1,lty=1,col=2,ylim=c(1,25000),xlim=c(0,30))
-mtext(side=3,"Zipf",cex=1)
-points(s20tmephylumRAD,col=2)
-lines(s20tmephylumRAD,col=2)
-points(s21tmephylumRAD,col=2)
-lines(s21tmephylumRAD,col=2)
-points(s22tmephylumRAD,col=2)
-lines(s22tmephylumRAD,col=2)
-
-plot(s12tmephylumRAD,pch=1,lty=1,col=7,ylim=c(1,25000),xlim=c(0,30))
-mtext(side=3,"Zipf-mandelbrot",cex=1)
-
 plot(s13tmephylumRAD,pch=1,lty=1,col=6,ylim=c(1,25000),xlim=c(0,30))
 mtext(side=3,"Preemption",cex=1)
 points(s19tmephylumRAD,col=6)
@@ -242,6 +223,19 @@ points(s17tmephylumRAD,col=6)
 lines(s17tmephylumRAD,col=6)
 points(s18tmephylumRAD,col=6)
 lines(s18tmephylumRAD,col=6)
+
+plot(s16tmephylumRAD,pch=1,lty=1,col=2,ylim=c(1,25000),xlim=c(0,30))
+mtext(side=3,"Zipf",cex=1)
+points(s20tmephylumRAD,col=2)
+lines(s20tmephylumRAD,col=2)
+points(s21tmephylumRAD,col=2)
+lines(s21tmephylumRAD,col=2)
+points(s22tmephylumRAD,col=2)
+lines(s22tmephylumRAD,col=2)
+
+plot(s12tmephylumRAD,pch=1,lty=1,col=7,ylim=c(1,25000),xlim=c(0,30))
+mtext(side=3,"Zipf-mandelbrot",cex=1)
+
 plot.new()
 #########################
 #For species 3
@@ -250,13 +244,6 @@ plot(s27tciphylumRAD,col=6,ylim=c(1,25000),xlim=c(0,30))
 mtext(side=3,"Preemption",cex=1)
 points(s38tciphylumRAD,col=6)
 lines(s38tciphylumRAD,col=6)
-
-plot(s28tciphylumRAD,col=11,ylim=c(1,25000),xlim=c(0,30))
-mtext(side=3,"Lognormal",cex=1)
-points(s41tciphylumRAD,col=11)
-lines(s41tciphylumRAD,col=11)
-points(s42tciphylumRAD,col=11)
-lines(s42tciphylumRAD,col=11)
 
 plot(s23tciphylumRAD,col=7,ylim=c(1,25000),xlim=c(0,30))
 mtext(side=3,"Zipf-mandelbrot",cex=1)
@@ -292,6 +279,15 @@ points(s43tciphylumRAD,col=7)
 lines(s43tciphylumRAD,col=7)
 points(s44tciphylumRAD,col=7)
 lines(s44tciphylumRAD,col=7)
+
+
+plot(s28tciphylumRAD,col=11,ylim=c(1,25000),xlim=c(0,30))
+mtext(side=3,"Lognormal",cex=1)
+points(s41tciphylumRAD,col=11)
+lines(s41tciphylumRAD,col=11)
+points(s42tciphylumRAD,col=11)
+lines(s42tciphylumRAD,col=11)
+
 plot.new()
 dev.off()
 ########
@@ -304,15 +300,11 @@ par(mfrow=c(1,2),mai=c(1,1,1,1))
 plot.rad.test(phylumRAD_test)
 plot.rad.test(phylumRAD_test, "post.hoc")
 dev.off()
-#HEREE
 #For class- but misses all the blanks and unclassified excluded because if not it would falsely summarize it all into one group
 classRAD<-radfit(t(as.data.frame(abundanceByClassBySample)[,1:44]))
 summary(classRAD)
 classRADPlot<-plot(classRAD)
 classRADPlot
-classRAD_test<-rad_test(classRAD, conf.level = 0.95, log = T )
-summary.rad.htest(classRAD_test)
-#Can't do the rad test for some reason??
 ##########################
 #rank-abundance dominance with OTU data
 ##########################################################
@@ -320,194 +312,11 @@ summary.rad.htest(classRAD_test)
 otuRAD<-radfit(t(as.data.frame(cat[(cat$Phylum != "Unclassified"),c(2:45)])))
 summary(otuRAD)
 otuRADPlot<-plot(otuRAD)
-
-if(plotPNG){
-  
-  otuRADPlotPath<-paste(plotsPath,"otuRADPlot.png",sep="")
-  png(otuRADPlotPath)
-  print(otuRADPlot)
-  dev.off()
-  
-}
-
-if(plotSVG){
-  
-  otuRADPlotPath<-paste(plotsPath,"otuRADPlot.svg",sep="")
-  svg(otuRADPlotPath)
-  print(otuRADPlot)
-  dev.off()
-  
-}
-
-#To group the same model lines for each sp
-##############
-#For specie T. auratis
-s1otuRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(2)]))
-s2otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(3)]))
-s3otuRADRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(4)]))
-s4otuRADRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(5)]))
-s5otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(6)]))
-s6otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(7)]))
-s7otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(8)]))
-s8otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(9)]))
-s9otuRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(10)]))
-s10otuRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(11)]))
-s11otuRAD<-rad.lognormal(t(cat[(cat$Phylum != ""),c(12)]))
-#For specie T.meloni
-s12otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(13)]))
-s13otuRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(14)]))
-s14otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(15)]))
-s15otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(16)]))
-s16otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(17)]))
-s17otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(18)]))
-s18otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(19)]))
-s19otuRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(20)]))
-s20otuRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(21)]))
-s21otuRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(22)]))
-s22otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(23)]))
-#For species T.citroni
-s23otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(24)]))
-s24otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(25)]))
-s25otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(26)]))
-s26otuRAD<-rad.preempt(t(cat[(cat$Phylum != ""),c(27)]))
-s27otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(28)]))
-s28otuRAD<-rad.preempt(t(cat[(cat$Phylum != ""),c(29)]))
-s29otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(30)]))
-s30otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(31)]))
-s31otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(32)]))
-s32otuRAD<-rad.preempt(t(cat[(cat$Phylum != ""),c(33)]))
-s33otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(34)]))
-s34otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(35)]))
-s35otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(36)]))
-s36otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(37)]))
-s37otuRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(38)]))
-s38otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(39)]))
-s39otuRAD<-rad.preempt(t(cat[(cat$Phylum != ""),c(40)]))
-s40otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(41)]))
-s41otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(42)]))
-s42otuRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(43)]))
-s43otuRAD<-rad.lognormal(t(cat[(cat$Phylum != ""),c(44)]))
-s44otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(45)]))
-######
-max(s8otuRAD$y)#y max 6397
-View(s8otuRAD)
-#Plot everything together
-png("Figures/18splots/oturad_grouped.png")
-par(mfrow=c(3,3))
-#For sp 1
-plot(s2otuRAD,pch=1,lty=1,col=2,ylim=c(1,6400),xlim=c(0,110))
-mtext(side=3,"Zipf",cex=1)
-points(s3otuRAD,col=2)
-lines(s3otuRAD,col=2)
-points(s5otuRAD,col=2)
-lines(s5otuRAD,col=2)
-points(s6otuRAD,col=2)
-lines(s6otuRAD,col=2)
-points(s7otuRAD,col=2)
-lines(s7otuRAD,col=2)
-points(s8otuRAD,col=2)
-lines(s8otuRAD,col=2)
-
-plot(s1otuRAD,pch=1,lty=1,col=7,ylim=c(1,6400),xlim=c(0,110))
-mtext(side=3,"Zipf-mandelbrot",cex=1)
-points(s4otuRAD,col=7)
-lines(s4otuRAD,col=7)
-points(s9otuRAD,col=7)
-lines(s9otuRAD,col=7)
-points(s10otuRAD,col=7)
-lines(s10otuRAD,col=7)
-
-plot(s11tciphylumRAD,col=11,ylim=c(1,6400),xlim=c(0,110))
-mtext(side=3,"Lognormal",cex=1)
-
-#For sp 2 #phylumRADPlot
-plot(s12otuRAD,pch=1,lty=1,col=2,ylim=c(1,6400),xlim=c(0,110))
-mtext(side=3,"Zipf",cex=1)
-points(s14otuRAD,col=2)
-lines(s14otuRAD,col=2)
-points(s15otuRAD,col=2)
-lines(s15otuRAD,col=2)
-points(s16otuRAD,col=2)
-lines(s16otuRAD,col=2)
-points(s15otuRAD,col=2)
-lines(s15otuRAD,col=2)
-points(s18otuRAD,col=2)
-lines(s18otuRAD,col=2)
-points(s22otuRAD,col=2)
-lines(s22otuRAD,col=2)
-
-
-plot(s13otuRAD,pch=1,lty=1,col=7,ylim=c(1,6400),xlim=c(0,110))
-mtext(side=3,"Zipf-mandelbrot",cex=1)
-points(s22otuRAD,col=7)
-lines(s22otuRAD,col=7)
-points(s20otuRAD,col=7)
-lines(s20otuRAD,col=7)
-points(s21otuRAD,col=7)
-lines(s21otuRAD,col=7)
-
-#########################
-#For species 3
-plot(s26tciphylumRAD,col=6,ylim=c(1,6400),xlim=c(0,110))
-mtext(side=3,"Preemption",cex=1)
-points(s28otuRAD,col=6)
-lines(s28otuRAD,col=6)
-points(s32otuRAD,col=6)
-lines(s32otuRAD,col=6)
-
-plot(s23otuRAD,col=2,ylim=c(1,6400),xlim=c(0,110))
-mtext(side=3,"Zipf",cex=1)
-points(s24otuRAD,col=2)
-lines(s24otuRAD,col=2)
-points(s25otuRAD,col=2)
-lines(s25otuRAD,col=2)
-points(s27otuRAD,col=2)
-lines(s27otuRAD,col=2)
-points(s29otuRAD,col=2)
-lines(s29otuRAD,col=2)
-points(s30otuRAD,col=2)
-lines(s30otuRAD,col=2)
-points(s31otuRAD,col=2)
-lines(s31otuRAD,col=2)
-points(s33otuRAD,col=2)
-lines(s33otuRAD,col=2)
-points(s34otuRAD,col=2)
-lines(s34otuRAD,col=2)
-points(s35otuRAD,col=2)
-lines(s35otuRAD,col=2)
-points(s36otuRAD,col=2)
-lines(s36otuRAD,col=2)
-points(s38otuRAD,col=2)
-lines(s38otuRAD,col=2)
-points(s40otuRAD,col=2)
-lines(s40otuRAD,col=2)
-points(s41otuRAD,col=2)
-lines(s41otuRAD,col=2)
-points(s44otuRAD,col=2)
-lines(s44otuRAD,col=2)
-
-plot(s37otuRAD,pch=1,lty=1,col=7,ylim=c(1,6400),xlim=c(0,110))
-mtext(side=3,"Zipf-mandelbrot",cex=1)
-points(s42otuRAD,col=7)
-lines(s42otuRAD,col=7)
-
-
-plot(s43otuRAD,col=11,ylim=c(1,6400),xlim=c(0,110))
-mtext(side=3,"Lognormal",cex=1)
-
-
-
+png("Figures/AS_16splots/otuRADplot_no_unclassified.png",height=20,width=10,units="cm",res=300)
+classRADPlot
 dev.off()
 
-
-otuRAD_test<-rad_test(otuRAD, conf.level = 0.95, log = T)
-summary.rad.htest(otuRAD_test)
-print.rad.test(otuRAD_test)
-par(mfrow=c(1,2),mai=c(1,1,1,1))
-plot.rad.test(otuRAD_test)
-plot.rad.test(otuRAD_test, "post.hoc")
-#######
-
+  
 # AND
 #########################
 #Fit rank-abundance dominance models  for NOT Getting rid of OTUs belonging to "unclassified" phyla
@@ -521,86 +330,71 @@ xotuRAD<-radfit(t(cat[c(2:45)]))
 
 summary(xotuRAD)
 xotuRADPlot<-plot(xotuRAD)
+tiff("./Figures/AS_16splots/radplototu.tiff",width=30,height=40,units="cm",res=300)
 xotuRADPlot
-
-if(plotPNG){
-  
-  xotuRADPlotPath<-paste(plotsPath,"xotuRADPlot.png",sep="")
-  png(xotuRADPlotPath)
-  print(xotuRADPlot)
-  dev.off()
-  
-}
-
-if(plotSVG){
-  
-  xotuRADPlotPath<-paste(plotsPath,"xotuRADPlot.svg",sep="")
-  svg(xotuRADPlotPath)
-  print(xotuRADPlot)
-  dev.off()
-  
-}
-
-#columns 5 11 and 22 didnt't converge so remove sample 4, 10 and 21
-
+dev.off()
 #For specie T. auratis
-xs1otuRAD<-rad.zipfbrot(t(cat[c(2)]))
+xs1otuRAD<-rad.zipf(t(cat[c(2)]))
 xs2otuRAD<-rad.zipf(t(cat[c(3)]))
-xs3otuRAD<-rad.zipf(t(cat[c(4)]))
-# xs4otuRAD<-rad.zipfbrot(t(cat[c(5)])) didn't converge
+xs3otuRAD<-rad.zipfbrot(t(cat[c(4)]))
+xs4otuRAD<-rad.zipf(t(cat[c(5)]))
 xs5otuRAD<-rad.zipf(t(cat[c(6)]))
 xs6otuRAD<-rad.zipf(t(cat[c(7)]))
 xs7otuRAD<-rad.zipf(t(cat[c(8)]))
 xs8otuRAD<-rad.zipf(t(cat[c(9)]))
-xs9otuRAD<-rad.zipfbrot(t(cat[c(10)]))
-#xs10otuRAD<-rad.zipfbrot(t(cat[c(11)]))#didn't converge
+xs9otuRAD<-rad.zipf(t(cat[c(10)]))
+xs10otuRAD<-rad.zipf(t(cat[c(11)]))
 xs11otuRAD<-rad.lognormal(t(cat[c(12)]))
 #For specie T.meloni
-xs12otuRAD<-rad.zipf(t(cat[c(13)]))
+xs12otuRAD<-rad.lognormal(t(cat[c(13)]))
 xs13otuRAD<-rad.zipfbrot(t(cat[c(14)]))
-xs14otuRAD<-rad.zipf(t(cat[c(15)]))
-xs15otuRAD<-rad.zipf(t(cat[c(16)]))
+xs14otuRAD<-rad.zipfbrot(t(cat[c(15)]))#COULD NOT CONVERGE
+xs15otuRAD<-rad.lognormal(t(cat[c(16)]))
 xs16otuRAD<-rad.zipf(t(cat[c(17)]))
-xs17otuRAD<-rad.zipf(t(cat[c(18)]))
-xs18otuRAD<-rad.zipf(t(cat[c(19)]))
+xs17otuRAD<-rad.preempt(t(cat[c(18)]))
+xs18otuRAD<-rad.lognormal(t(cat[c(19)]))
 xs19otuRAD<-rad.zipfbrot(t(cat[c(20)]))
-xs20otuRAD<-rad.zipfbrot(t(cat[c(21)]))
-#xs21otuRAD<-rad.zipfbrot(t(cat[c(22)])) didn't converge
+xs20otuRAD<-rad.zipf(t(cat[c(21)]))
+xs21otuRAD<-rad.zipf(t(cat[c(22)]))
 xs22otuRAD<-rad.zipf(t(cat[c(23)]))
 #For species T.citroni
 xs23otuRAD<-rad.zipf(t(cat[c(24)]))
-xs24otuRAD<-rad.zipf(t(cat[c(25)]))
+xs24otuRAD<-rad.zipfbrot(t(cat[c(25)]))
 xs25otuRAD<-rad.zipf(t(cat[c(26)]))
-xs26otuRAD<-rad.preempt(t(cat[c(27)]))
-xs27otuRAD<-rad.zipf(t(cat[c(28)]))
-xs28otuRAD<-rad.preempt(t(cat[c(29)]))
+xs26otuRAD<-rad.zipf(t(cat[c(27)]))
+xs27otuRAD<-rad.zipfbrot(t(cat[c(28)]))
+xs28otuRAD<-rad.zipfbrot(t(cat[c(29)]))
 xs29otuRAD<-rad.zipf(t(cat[c(30)]))
 xs30otuRAD<-rad.zipf(t(cat[c(31)]))
 xs31otuRAD<-rad.zipf(t(cat[c(32)]))
-xs32otuRAD<-rad.preempt(t(cat[c(33)]))
-xs33otuRAD<-rad.zipf(t(cat[c(34)]))
+xs32otuRAD<-rad.zipfbrot(t(cat[c(33)]))
+xs33otuRAD<-rad.zipfbrot(t(cat[c(34)]))
 xs34otuRAD<-rad.zipf(t(cat[c(35)]))
 xs35otuRAD<-rad.zipf(t(cat[c(36)]))
 xs36otuRAD<-rad.zipf(t(cat[c(37)]))
-xs37otuRAD<-rad.zipfbrot(t(cat[c(38)]))
-xs38otuRAD<-rad.zipf(t(cat[c(39)]))
-xs39otuRAD<-rad.preempt(t(cat[c(40)]))
-xs40otuRAD<-rad.zipf(t(cat[c(41)]))
+xs37otuRAD<-rad.zipf(t(cat[c(38)]))
+xs38otuRAD<-rad.zipfbrot(t(cat[c(39)]))
+xs39otuRAD<-rad.zipf(t(cat[c(40)]))
+xs40otuRAD<-rad.zipfbrot(t(cat[c(41)]))
 xs41otuRAD<-rad.zipf(t(cat[c(42)]))
-xs42otuRAD<-rad.zipfbrot(t(cat[c(43)]))
-xs43otuRAD<-rad.lognormal(t(cat[c(44)]))
-xs44otuRAD<-rad.zipf(t(cat[c(45)]))
+xs42otuRAD<-rad.lognormal(t(cat[c(43)]))
+xs43otuRAD<-rad.zipfbrot(t(cat[c(44)]))
+xs44otuRAD<-rad.preempt(t(cat[c(45)]))
 ######
 #Plot everything together
-
+#Order: Preempt, zipf,zipf-mandel,lognormal,null
 #Plot everything together
-png("./Figures/18splots/xoturad_grouped.png")
-par(mfrow=c(3,4))#13650
+max(xs14otuRAD$y) #16039
+
+tiff("./Figures/AS_16splots/xoturad_grouped.tiff",width=40,height=30,res=300)
+par(mfrow=c(3,4))
 #For sp 1
-plot(xs2otuRAD,pch=1,lty=1,col=2,ylim=c(1,13650),xlim=c(0,110))
+plot(xs1otuRAD,pch=1,lty=1,col=2,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Zipf",cex=1)
-points(xs3otuRAD,col=2)
-lines(xs3otuRAD,col=2)
+points(xs2otuRAD,col=2)
+lines(xs2otuRAD,col=2)
+points(xs4otuRAD,col=2)
+lines(xs4otuRAD,col=2)
 points(xs5otuRAD,col=2)
 lines(xs5otuRAD,col=2)
 points(xs6otuRAD,col=2)
@@ -609,102 +403,108 @@ points(xs7otuRAD,col=2)
 lines(xs7otuRAD,col=2)
 points(xs8otuRAD,col=2)
 lines(xs8otuRAD,col=2)
+points(xs9otuRAD,col=2)
+lines(xs9otuRAD,col=2)
+points(xs10otuRAD,col=2)
+lines(xs10otuRAD,col=2)
 
-plot(xs1otuRAD,pch=1,lty=1,col=7,ylim=c(1,13650),xlim=c(0,110))
+plot(xs3otuRAD,pch=1,lty=1,col=7,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Zipf-mandelbrot",cex=1)
-points(xs9otuRAD,col=7)
-lines(xs9otuRAD,col=7)
 
-plot(xs11otuRAD,pch=1,lty=1,col=11,ylim=c(1,13650),xlim=c(0,110))
+plot(xs11otuRAD,pch=1,lty=1,col=11,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Lognormal",cex=1)
 
 plot.new()
 
 #For sp 2 #phylumRADPlot
-plot(xs12otuRAD,pch=1,lty=1,col=2,ylim=c(1,13650),xlim=c(0,110))
+plot(xs17otuRAD,col=6,ylim=c(1,16100),xlim=c(0,310))
+mtext(side=3,"Preemption",cex=1)
+
+plot(xs16otuRAD,pch=1,lty=1,col=2,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Zipf",cex=1)
-points(xs14otuRAD,col=2)
-lines(xs14otuRAD,col=2)
-points(xs15otuRAD,col=2)
-lines(xs15otuRAD,col=2)
-points(xs16otuRAD,col=2)
-lines(xs16otuRAD,col=2)
-points(xs17otuRAD,col=2)
-lines(xs17otuRAD,col=2)
-points(xs18otuRAD,col=2)
-lines(xs18otuRAD,col=2)
+points(xs20otuRAD,col=2)
+lines(xs20otuRAD,col=2)
+points(xs21otuRAD,col=2)
+lines(xs21otuRAD,col=2)
 points(xs22otuRAD,col=2)
 lines(xs22otuRAD,col=2)
-plot(xs13otuRAD,pch=1,lty=1,col=7,ylim=c(1,13650),xlim=c(0,110))
+
+plot(xs13otuRAD,pch=1,lty=1,col=7,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Zipf-mandelbrot",cex=1)
 points(xs19otuRAD,col=7)
 lines(xs19otuRAD,col=7)
-points(xs20otuRAD,col=7)
-lines(xs20otuRAD,col=7)
-plot.new()
-plot.new()
+
+plot(xs12otuRAD,pch=1,lty=1,col=11,ylim=c(1,16100),xlim=c(0,310))
+mtext(side=3,"Lognormal",cex=1)
+points(xs15otuRAD,col=11)
+lines(xs15otuRAD,col=11)
+points(xs18otuRAD,col=11)
+lines(xs18otuRAD,col=11)
 #########################
 #For species 3
-plot(xs26otuRAD,col=6,ylim=c(1,13650),xlim=c(0,110))
+plot(xs44otuRAD,col=6,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Preemption",cex=1)
-points(xs28otuRAD,col=6)
-lines(xs28otuRAD,col=6)
-points(xs32otuRAD,col=6)
-lines(xs32otuRAD,col=6)
-points(xs39otuRAD,col=6)
-lines(xs39otuRAD,col=6)
 
-plot(xs23otuRAD,pch=1,lty=1,col=2,ylim=c(1,13650),xlim=c(0,110))
+
+
+plot(xs23otuRAD,pch=1,lty=1,col=2,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Zipf",cex=1)
-points(xs24otuRAD,col=2)
-lines(xs24otuRAD,col=2)
 points(xs25otuRAD,col=2)
 lines(xs25otuRAD,col=2)
-points(xs27otuRAD,col=2)
-lines(xs27otuRAD,col=2)
+points(xs26otuRAD,col=2)
+lines(xs26otuRAD,col=2)
 points(xs29otuRAD,col=2)
 lines(xs29otuRAD,col=2)
 points(xs30otuRAD,col=2)
 lines(xs30otuRAD,col=2)
 points(xs31otuRAD,col=2)
 lines(xs31otuRAD,col=2)
-points(xs33otuRAD,col=2)
-lines(xs33otuRAD,col=2)
 points(xs34otuRAD,col=2)
 lines(xs34otuRAD,col=2)
 points(xs35otuRAD,col=2)
 lines(xs35otuRAD,col=2)
 points(xs36otuRAD,col=2)
 lines(xs36otuRAD,col=2)
-points(xs38otuRAD,col=2)
-lines(xs38otuRAD,col=2)
-points(xs40otuRAD,col=2)
-lines(xs40otuRAD,col=2)
-points(xs44otuRAD,col=2)
-lines(xs44otuRAD,col=2)
+points(xs37otuRAD,col=2)
+lines(xs37otuRAD,col=2)
+points(xs39otuRAD,col=2)
+lines(xs39otuRAD,col=2)
+points(xs41otuRAD,col=2)
+lines(xs41otuRAD,col=2)
 
-plot(xs43otuRAD,col=11,ylim=c(1,6520),xlim=c(0,110))
+
+plot(xs42otuRAD,col=11,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Lognormal",cex=1)
 
-plot(xs37otuRAD,col=7,ylim=c(1,6520),xlim=c(0,110))
+plot(xs24otuRAD,col=7,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Zipf-mandelbrot",cex=1)
-points(xs42otuRAD,col=7)
-lines(xs42otuRAD,col=7)
-
-
+points(xs27otuRAD,col=7)
+lines(xs27otuRAD,col=7)
+points(xs28otuRAD,col=7)
+lines(xs28otuRAD,col=7)
+points(xs32otuRAD,col=7)
+lines(xs32otuRAD,col=7)
+points(xs33otuRAD,col=7)
+lines(xs33otuRAD,col=7)
+points(xs38otuRAD,col=7)
+lines(xs38otuRAD,col=7)
+points(xs40otuRAD,col=7)
+lines(xs40otuRAD,col=7)
+points(xs43otuRAD,col=7)
+lines(xs43otuRAD,col=7)
 dev.off()
-#5 11 and 22 didnt't converge so remove these
+
 #head(cat)
-xotuRAD<-radfit(t(cat[c(2,3,4,6:10,12:21,23:45)]))
+xotuRAD<-radfit(t(cat[c(2:13,15:45)]))
 summary(xotuRAD)
 
 xotuRAD_test<-rad_test(xotuRAD, conf.level = 0.95, log = T )
-??rad_test()
 summary.rad.htest(xotuRAD_test)
+
+png("Figures/AS_16splots/allOTU16radtest.png",height=20,width=30,units="cm",res=300)
 par(mfrow=c(1,2),mai=c(1,1,1,1))
-print.rad.test(xotuRAD_test)
 plot.rad.test(xotuRAD_test)
 plot.rad.test(xotuRAD_test, "post.hoc")
-
+dev.off()
 
 

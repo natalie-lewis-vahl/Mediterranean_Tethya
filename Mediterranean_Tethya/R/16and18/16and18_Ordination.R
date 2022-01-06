@@ -3,11 +3,11 @@ library(matrixStats)
 library(dplyr)
 matrix_file<-"./Data/16and18s_otu.csv"
 
-otus<-read.csv("./Data/16and18s_otu.csv", sep=";")
+tus<-arrange(otus, X.OTU.ID)
+taotus<-read.csv("./Data/16and18s_otu.csv", sep=";")
 #BInd taxonomy to remove bacterial OTUs from 18s dataset 
 taxa<-read.csv("./Data/16ans18s_taxa.csv",sep=";")
 head(otus)
-otus<-arrange(otus, X.OTU.ID)
 taxa<-arrange(taxa,sequence_identifier)
 otu_and_taxa<-bind_cols(otus,taxa)
 otu_and_taxa<-otu_and_taxa%>%filter(!(Domain=="Bacteria" & dataset=="18s"))
@@ -120,7 +120,7 @@ heatmap(matrix_zscores[rownames(matrix_zscores) %in% variableOTUs,])
 
 dev.off()
 
-####I don't know=????
+####
 ####Vegemite
 data(dune)
 sponges<-d18s_matrix[,-c(45,46,47)]

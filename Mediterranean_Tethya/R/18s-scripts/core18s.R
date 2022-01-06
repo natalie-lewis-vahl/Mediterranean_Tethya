@@ -41,23 +41,26 @@ unique(xotu_and_taxa$`otus[, 1]`)
 xotu_and_taxa[xotu_and_taxa==""]<-"Unclassified"
 View(xotu_and_taxa)
 #Core communities
+core_community<-xotu_and_taxa%>%
+  dplyr::filter(sumtau>=0.90 |sumtme>=0.90 | sumtci>=0.90)
+nrow(core_community)#17
+#OR
 cc_all<-xotu_and_taxa%>%
-  filter(sumall== 1.00)%>%
-  mutate("which_sp"="all")#0 with sponges removed 2 otus for the sponge (demospongiae)
-
+  filter(sumall>= 0.90)%>%
+  mutate("which_sp"="all")#0
+nrow(cc_all)
 cc_tau<-xotu_and_taxa%>%
-  filter(sumtau==1.00)%>%
-  mutate("which_sp"="T. au")#8 unclassified and 4 demospongiae (with bacteria had 10 core bacteria)
-dim(cc_tau)
+  filter(sumtau>=0.90)%>%
+  mutate("which_sp"="T. au")#11
+nrow(cc_tau)
 cc_tme<-xotu_and_taxa%>%
-  filter(sumtme== 1.00)%>%
-  mutate("which_sp"="T. me")#7 core, 4 unclassified, 1 cnidarian and 2 demospongiae
-#NB. when bacteria included no core bacteria
-dim(cc_tme)
+  filter(sumtme>= 0.90)%>%
+  mutate("which_sp"="T. me")
+nrow(cc_tme)#7
 cc_tci<-xotu_and_taxa%>%
-  filter(sumtci== 1.00)%>%
-  mutate("which_sp"="T. ci")#only 2 which are for demospongiae (same with and without bacteria)
-dim(cc_tci)
+  filter(sumtci>= 0.90)%>%
+  mutate("which_sp"="T. ci")
+nrow(cc_tci)#0
 #####
 #Ven Diagram
 library(VennDiagram)
@@ -66,7 +69,7 @@ myCol <- brewer.pal(3, "Pastel2")
 venn.diagram(
   x = list(cc_tau$sequence_identifier, cc_tme$sequence_identifier, cc_tci$sequence_identifier),
   category.names = c("T. aurantium" , "T. meloni " , "T. citroni"),
-  filename = 'without_bactcore18s_vendiagram.png',
+  filename = 'Figures/18splots/core18s_vendiagram.png',
   output=TRUE,
   imagetype="png",
   height = 500 , 
@@ -97,30 +100,3 @@ venn.diagram(
   cat.fontfamily = "sans",
   rotation = 1
 )
-#Look at sp present for each species seperately
-#Tethya aurantium
-#remove rows for Tme and Tci
-tautable<-xotu_and_taxa[,-13:-45]
-#Filter out otus not present
-tautable<-tautable%>%
-  filter(sumtau>0)
-
-unique(tautable$Phylum)
-
-#Tethya meloni
-#remove rows for Tau and Tci
-tmetable<-xotu_and_taxa[,-c(2:12,24:45)]
-#Filter out otus not present
-tmetable<-tmetable%>%
-  filter(sumtme>0)
-
-unique(tmetable$Phylum)
-
-#Tethya citroni
-#remove rows for Tau and Tme
-tcitable<-xotu_and_taxa[,-c(2:23)]
-#Filter out otus not present
-tcitable<-tcitable%>%
-  filter(sumtci>0)
-
-unique(tcitable$Phylum)

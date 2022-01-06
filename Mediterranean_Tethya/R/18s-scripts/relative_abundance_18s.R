@@ -100,7 +100,7 @@ ggplot(dataset, aes(variable, y=relative_abundance)) + geom_col(aes(fill=Phylum)
                                Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                Rhodophyta,Unclassified))+
   labs(x="Species",y="Relative abundance")+scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citroni)))+theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
-ggsave("relative_abundances_18s.jpg",path=plotsPath)
+ggsave("relative_abundances_18s.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
 
 #REpeat but without unclassified and porifera OTUS 
 boatmelt<-oatmelt[oatmelt$Phylum!="Unclassified"&oatmelt$Phylum!="Porifera",]
@@ -119,7 +119,7 @@ ggplot(bdataset, aes(variable, y=relative_abundance)) + geom_col(aes(fill=Phylum
                                Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                Rhodophyta,Unclassified))+
   labs(x="Species",y="Relative abundance")+scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citroni)))+theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
-ggsave("relative_abundances_18s_wo_unclassandporifera.jpg",path=plotsPath)
+ggsave("relative_abundances_18s_wo_unclassandporifera.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
 
 
 unique(oat$Domain)
@@ -135,7 +135,7 @@ ggplot(otucount, aes(x=Numb_otu,y=Phylum))+geom_col(fill=c(Annelida,Arthropoda,B
                                                                                   Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
                                                                                   Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                                                                   Rhodophyta,Unclassified))+labs(x="Number of OTUs",y="Phylum")+theme_bw()
-ggsave("Freq_of_otu.jpg",path=plotsPath)
+ggsave("Freq_of_otu.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
 #WIhtout unclassified
 
 botu_count<-otucount[(otucount$Phylum!="Unclassified"),]
@@ -171,7 +171,7 @@ ggplot(botu_count)+
   Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
   Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
   Rhodophyta))+labs(x="Number of OTUs",y="Phylum")+theme_bw()
-ggsave("Freq_of_otu_wo_unclass.jpg",path=plotsPath)
+ggsave("Freq_of_otu_wo_unclass.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
 
 #BUbble plot for comparing, richness and abundance of phylums across species
 unique(bdataset$Phylum)
@@ -195,7 +195,7 @@ ggplot(bubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
                                          Kinorhyncha,Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                          Rhodophyta,Unclassified))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
   scale_size(range = c(.7,20))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ theme(axis.text.x = element_text(face = "italic"))
-ggsave("phylum_richness_and_abundance_bubble.jpg",path=plotsPath)
+ggsave("phylum_richness_and_abundance_bubble.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
 #WIthout unclassified, porifera and ciliophora
 bubble2<-bubbledata[(bubbledata$Phylum!="Unclassified"&bubbledata$Phylum!="Porifera"),]
 bubble2<-bubble2[(bubble2$Phylum!="Ciliophora"),]
@@ -205,7 +205,7 @@ ggplot(bubble2,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
                               Kinorhyncha,Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,
                               Rhodophyta))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
   scale_size(range = c(.7,20))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ theme(axis.text.x = element_text(face = "italic"))
-ggsave("phylum_rich_and_abund_bubble_withoutunclass-cill-porifera.jpg",path=plotsPath)
+ggsave("phylum_rich_and_abund_bubble_withoutunclass-cill-porifera.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
 #TO LOOK AT RICHNESS AS THE SIZE Instead and ABUNDANCE on y axis
 #ggplot(bubble2,aes(x=variable,y=abundance,color=Phylum,size=Numb_otu))+
 #  scale_color_manual(values=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,
