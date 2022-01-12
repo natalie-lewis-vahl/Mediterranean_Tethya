@@ -14,11 +14,12 @@ count<-apply(merged[-c(1:8)],1,sum)
 merged<-cbind(merged,count)
 
 #Remove OTUS with less than 50 reads
-filtered<-merged[merged$count>50,]
+filtered<-merged[merged$count>=50,]
 filtered[filtered==""]<-"Unclassified"
-
+View(filtered)
+??count
 plot1data<-filtered%>%
-  count(Phylum)
+  dplyr::count(Phylum)
 
 data<-plot1data$n
 names(data)<-plot1data$Phylum
@@ -33,7 +34,7 @@ barplot(data2)
 #delete row with unclassified phyla
 filtered<-filtered[!(filtered$Phylum=="Unclassified"),]
 counts<-table(filtered$Class,filtered$Phylum)
-jpeg("./Figures/AS_16splots/overall16s_taxa_distribution.jpeg",units="in", width=15, height=5, res=300)
+jpeg("./Figures/AS_16splots/overall16s_taxa_distribution.jpeg",units="in", width=35, height=10, res=300)
 barplot(counts,xlab="Phyla",ylab="Number of OTUs",cex.names= 0.5,ylim=c(0,160))
 dev.off()
 ??barplot

@@ -23,7 +23,7 @@ head(bubbledata)
 #SHowing between phylums
 bubbledata[bubbledata==0]<-NA
 #Showing between species
-tiff("./Figures/AS_16splots/bubble_phylum_richness_and_abundance.tiff",height=20,width=30,units="cm",res=300)
+png("./Figures/AS_16splots/bubble_phylum_richness_and_abundance.png",height=20,width=30,units="cm",res=300)
 ggplot(bubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
   scale_color_manual(values=c(AcidobacteriotaCol,ActinobacteriotaCol,BacteroidotaCol,
                               CalditrichotaCol,ChloroflexiCol,CrenarchaeotaCol,CyanobacteriaCol,
@@ -68,7 +68,7 @@ dataset[dataset==0]<-NA
 dataset<-dataset%>%
   filter(relative_abundance>0)
 ###
-tiff("./Figures/AS_16splots/bubble_otu_abundance.tiff",height=30,width=30,units="cm",res=300)
+png("./Figures/AS_16splots/bubble_otu_abundance.png",height=30,width=30,units="cm",res=300)
 
 ggplot(dataset,aes(x=variable,y=relative_abundance,color=Phylum))+
   scale_color_manual(values=c(AcidobacteriotaCol,ActinobacteriotaCol,BacteroidotaCol,
@@ -82,7 +82,7 @@ ggplot(dataset,aes(x=variable,y=relative_abundance,color=Phylum))+
 dev.off()
 
 #Abundance divided by richness
-tiff("./Figures/AS_16splots/bubble_phyla_abundance_dividedby_richness.tiff",height=20,width=30,units="cm",res=300)
+png("./Figures/AS_16splots/bubble_phyla_abundance_dividedby_richness.png",height=20,width=30,units="cm",res=300)
 
 ggplot(bubbledata,aes(x=variable,y=abundance/Numb_otu,color=Phylum))+
   scale_color_manual(values=c(AcidobacteriotaCol,ActinobacteriotaCol,BacteroidotaCol,

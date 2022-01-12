@@ -99,7 +99,7 @@ cat<-bind_cols(countsDF[order(countsDF$X.OTU.ID),], taxa[order(taxa$sequence_ide
 head(cat)
 #FIlter out unnecessary data
 ##OR get rid of reads less than 50
-cat<-cat[cat$countSum>50,]
+cat<-cat[cat$countSum>=50,]
 
 head(cat)
 #Till which column do the samples go on to?
@@ -119,10 +119,8 @@ phylumRAD<-radfit(t(as.data.frame(abundanceByPhylumBySample)[,1:44]))
 summary(phylumRAD)
 phylumRADPlot<-plot(phylumRAD)
 phylumRADPlot
-View(abundanceByPhylumBySample)
 
-##############3
-
+##############
 #For specie T. auratis
 s1tauphylumRAD<-rad.zipf(t(as.data.frame(abundanceByPhylumBySample)[,1]))
 s2tauphylumRAD<-rad.zipf(t(as.data.frame(abundanceByPhylumBySample)[,2]))
@@ -135,6 +133,7 @@ s8tauphylumRAD<-rad.zipf(t(as.data.frame(abundanceByPhylumBySample)[,8]))
 s9tauphylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,9]))
 s10tauphylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,10]))
 s11tauphylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,11]))
+s44tauphylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,44]))
 
 phylumRADPlot
 #For specie T.meloni
@@ -149,6 +148,8 @@ s19tmephylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,19]))
 s20tmephylumRAD<-rad.zipf(t(as.data.frame(abundanceByPhylumBySample)[,20]))
 s21tmephylumRAD<-rad.zipf(t(as.data.frame(abundanceByPhylumBySample)[,21]))
 s22tmephylumRAD<-rad.zipf(t(as.data.frame(abundanceByPhylumBySample)[,22]))
+s42tmephylumRAD<-rad.zipf(t(as.data.frame(abundanceByPhylumBySample)[,42]))
+s43tmephylumRAD<-rad.zipf(t(as.data.frame(abundanceByPhylumBySample)[,43]))
 
 ###########
 #For species T.citroni
@@ -171,15 +172,11 @@ s38tciphylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,38]))
 s39tciphylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,39]))
 s40tciphylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,40]))
 s41tciphylumRAD<-rad.lognormal(t(as.data.frame(abundanceByPhylumBySample)[,41]))
-s42tciphylumRAD<-rad.lognormal(t(as.data.frame(abundanceByPhylumBySample)[,42]))
-s43tciphylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,43]))
-s44tciphylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,44]))
-
 ###############
 
 #############
 #Plot everything together
-tiff("Figures/AS_16splots/AS16s_phylumrad_grouped.tiff",width=40,height=30,units="cm",res=300)
+png("Figures/AS_16splots/AS16s_phylumrad_grouped.png",width=40,height=30,units="cm",res=300)
 par(mfrow=c(3,4))
 #For sp 1
 max(s4tauphylumRAD$y)#Maximum for y is 24556
@@ -200,12 +197,15 @@ lines(s7tauphylumRAD,col=2)
 points(s8tauphylumRAD,col=2)
 lines(s8tauphylumRAD,col=2)
 
+
 plot(s9tauphylumRAD,pch=1,lty=1,col=7,ylim=c(1,25000),xlim=c(0,30))
 mtext(side=3,"Zipf-mandelbrot",cex=1)
 points(s10tauphylumRAD,col=7)
 lines(s10tauphylumRAD,col=7)
 points(s11tauphylumRAD,col=7)
 lines(s11tauphylumRAD,col=7)
+points(s44tauphylumRAD,col=7)
+lines(s44tauphylumRAD,col=7)
 
 plot(s5tauphylumRAD,pch=1,lty=1,col=11,ylim=c(1,25000),xlim=c(0,30))
 mtext(side=3,"Lognormal",cex=1)
@@ -235,8 +235,11 @@ lines(s22tmephylumRAD,col=2)
 
 plot(s12tmephylumRAD,pch=1,lty=1,col=7,ylim=c(1,25000),xlim=c(0,30))
 mtext(side=3,"Zipf-mandelbrot",cex=1)
+points(s43tmephylumRAD,col=7)
+lines(s43tmephylumRAD,col=7)
 
-plot.new()
+plot(s42tciphylumRAD,col=11,ylim=c(1,25000),xlim=c(0,30))
+mtext(side=3,"Lognormal",cex=1)
 #########################
 #For species 3
 
@@ -275,18 +278,12 @@ points(s39tciphylumRAD,col=7)
 lines(s39tciphylumRAD,col=7)
 points(s40tciphylumRAD,col=7)
 lines(s40tciphylumRAD,col=7)
-points(s43tciphylumRAD,col=7)
-lines(s43tciphylumRAD,col=7)
-points(s44tciphylumRAD,col=7)
-lines(s44tciphylumRAD,col=7)
 
 
 plot(s28tciphylumRAD,col=11,ylim=c(1,25000),xlim=c(0,30))
 mtext(side=3,"Lognormal",cex=1)
 points(s41tciphylumRAD,col=11)
 lines(s41tciphylumRAD,col=11)
-points(s42tciphylumRAD,col=11)
-lines(s42tciphylumRAD,col=11)
 
 plot.new()
 dev.off()
@@ -330,7 +327,7 @@ xotuRAD<-radfit(t(cat[c(2:45)]))
 
 summary(xotuRAD)
 xotuRADPlot<-plot(xotuRAD)
-tiff("./Figures/AS_16splots/radplototu.tiff",width=30,height=40,units="cm",res=300)
+png("./Figures/AS_16splots/radplototu.png",width=30,height=40,units="cm",res=300)
 xotuRADPlot
 dev.off()
 #For specie T. auratis
@@ -345,8 +342,10 @@ xs8otuRAD<-rad.zipf(t(cat[c(9)]))
 xs9otuRAD<-rad.zipf(t(cat[c(10)]))
 xs10otuRAD<-rad.zipf(t(cat[c(11)]))
 xs11otuRAD<-rad.lognormal(t(cat[c(12)]))
+xs44otuRAD<-rad.preempt(t(cat[c(45)]))
+
 #For specie T.meloni
-xs12otuRAD<-rad.lognormal(t(cat[c(13)]))
+xs12otuRAD<-rad.zipfbrot(t(cat[c(13)]))
 xs13otuRAD<-rad.zipfbrot(t(cat[c(14)]))
 xs14otuRAD<-rad.zipfbrot(t(cat[c(15)]))#COULD NOT CONVERGE
 xs15otuRAD<-rad.lognormal(t(cat[c(16)]))
@@ -357,7 +356,9 @@ xs19otuRAD<-rad.zipfbrot(t(cat[c(20)]))
 xs20otuRAD<-rad.zipf(t(cat[c(21)]))
 xs21otuRAD<-rad.zipf(t(cat[c(22)]))
 xs22otuRAD<-rad.zipf(t(cat[c(23)]))
-#For species T.citroni
+xs42otuRAD<-rad.lognormal(t(cat[c(43)]))
+xs43otuRAD<-rad.zipfbrot(t(cat[c(44)]))
+#For species T.citrina
 xs23otuRAD<-rad.zipf(t(cat[c(24)]))
 xs24otuRAD<-rad.zipfbrot(t(cat[c(25)]))
 xs25otuRAD<-rad.zipf(t(cat[c(26)]))
@@ -377,18 +378,17 @@ xs38otuRAD<-rad.zipfbrot(t(cat[c(39)]))
 xs39otuRAD<-rad.zipf(t(cat[c(40)]))
 xs40otuRAD<-rad.zipfbrot(t(cat[c(41)]))
 xs41otuRAD<-rad.zipf(t(cat[c(42)]))
-xs42otuRAD<-rad.lognormal(t(cat[c(43)]))
-xs43otuRAD<-rad.zipfbrot(t(cat[c(44)]))
-xs44otuRAD<-rad.preempt(t(cat[c(45)]))
 ######
 #Plot everything together
 #Order: Preempt, zipf,zipf-mandel,lognormal,null
 #Plot everything together
 max(xs14otuRAD$y) #16039
 
-tiff("./Figures/AS_16splots/xoturad_grouped.tiff",width=40,height=30,res=300)
+png("./Figures/AS_16splots/xoturad_grouped.png",width=40,height=30,units="cm",res=300)
 par(mfrow=c(3,4))
 #For sp 1
+plot(xs44otuRAD,col=6,ylim=c(1,16100),xlim=c(0,310))
+mtext(side=3,"Preemption",cex=1)
 plot(xs1otuRAD,pch=1,lty=1,col=2,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Zipf",cex=1)
 points(xs2otuRAD,col=2)
@@ -414,8 +414,6 @@ mtext(side=3,"Zipf-mandelbrot",cex=1)
 plot(xs11otuRAD,pch=1,lty=1,col=11,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Lognormal",cex=1)
 
-plot.new()
-
 #For sp 2 #phylumRADPlot
 plot(xs17otuRAD,col=6,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Preemption",cex=1)
@@ -429,23 +427,23 @@ lines(xs21otuRAD,col=2)
 points(xs22otuRAD,col=2)
 lines(xs22otuRAD,col=2)
 
-plot(xs13otuRAD,pch=1,lty=1,col=7,ylim=c(1,16100),xlim=c(0,310))
+plot(xs12otuRAD,pch=1,lty=1,col=7,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Zipf-mandelbrot",cex=1)
+points(xs13otuRAD,col=7)
+lines(xs13otuRAD,col=7)
 points(xs19otuRAD,col=7)
 lines(xs19otuRAD,col=7)
+points(xs43otuRAD,col=7)
+lines(xs43otuRAD,col=7)
 
-plot(xs12otuRAD,pch=1,lty=1,col=11,ylim=c(1,16100),xlim=c(0,310))
+plot(xs15otuRAD,pch=1,lty=1,col=11,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Lognormal",cex=1)
-points(xs15otuRAD,col=11)
-lines(xs15otuRAD,col=11)
 points(xs18otuRAD,col=11)
 lines(xs18otuRAD,col=11)
+points(xs42otuRAD,col=11)
+lines(xs42otuRAD,col=11)
 #########################
 #For species 3
-plot(xs44otuRAD,col=6,ylim=c(1,16100),xlim=c(0,310))
-mtext(side=3,"Preemption",cex=1)
-
-
 
 plot(xs23otuRAD,pch=1,lty=1,col=2,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Zipf",cex=1)
@@ -473,9 +471,6 @@ points(xs41otuRAD,col=2)
 lines(xs41otuRAD,col=2)
 
 
-plot(xs42otuRAD,col=11,ylim=c(1,16100),xlim=c(0,310))
-mtext(side=3,"Lognormal",cex=1)
-
 plot(xs24otuRAD,col=7,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Zipf-mandelbrot",cex=1)
 points(xs27otuRAD,col=7)
@@ -490,8 +485,9 @@ points(xs38otuRAD,col=7)
 lines(xs38otuRAD,col=7)
 points(xs40otuRAD,col=7)
 lines(xs40otuRAD,col=7)
-points(xs43otuRAD,col=7)
-lines(xs43otuRAD,col=7)
+
+plot.new()
+plot.new()
 dev.off()
 
 #head(cat)

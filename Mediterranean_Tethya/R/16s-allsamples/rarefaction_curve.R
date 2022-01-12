@@ -16,7 +16,7 @@ xdata<-cbind(data,countSum)
 xdata<-xdata[xdata$countSum >=50,]
 head(xdata)
 #take rows for species T. aurantium and transpose for analysis
-data<-t(as.data.frame(xdata[,2:12]))
+data<-t(as.data.frame(xdata[,c(2:12,45)]))
 head(data)
 library(vegan)
 S <- specnumber(data)
@@ -27,7 +27,7 @@ plot(S, Srare, xlab = "Observed No. of Species", ylab = "Rarefied No. of Species
 abline(0, 1)
 rarecurve(data, step =1, sample = raremax, col = "blue", cex = 0.4)
 #For T meloni
-data_me<-t(as.data.frame(xdata[,13:23]))
+data_me<-t(as.data.frame(xdata[,c(13:23,43,44)]))
 S_me <- specnumber(data_me)
 raremax_me<-min(rowSums(data_me))
 Srare_me <- rarefy(data_me, raremax_me)
@@ -36,7 +36,7 @@ plot(S_me, Srare_me, xlab = "Observed No. of Species", ylab = "Rarefied No. of S
 abline(0, 1)
 rarecurve(data_me, step =1, sample = raremax_me, col = "blue", cex = 0.4)
 #for T citrina
-data_ci<-t(as.data.frame(xdata[,24:45]))
+data_ci<-t(as.data.frame(xdata[,24:42]))
 S_ci <- specnumber(data_ci)
 raremax_ci<-min(rowSums(data_ci))
 Srare_ci <- rarefy(data_ci, raremax_ci)

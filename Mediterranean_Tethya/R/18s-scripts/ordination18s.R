@@ -19,7 +19,7 @@ head(otus_and_taxa)
 countSum<-apply(otus_and_taxa[2:45],1,sum)
 otus_and_taxa<-cbind(otus_and_taxa,countSum)
 #same thing as using size column from taxa dataset
-otus_and_taxa<-otus_and_taxa[otus_and_taxa$countSum>18,]
+otus_and_taxa<-otus_and_taxa[otus_and_taxa$countSum>=5,]
 
 d18s_matrix<-otus_and_taxa[,-c(46:57)]
 #rEMOVE SEQUENCE id AS A COLUMN AND MAKE THEM THE ROW NAMES
@@ -43,19 +43,19 @@ d18s_matrix<-d18s_matrix[,-1]
 #358 rows with only OTU1 removed and 499 rows with OTU2 also removed
 
 #groups 
-#T aurantium: GW1941 till GW1951 inclusive 
-#T meloni: GW1952 till GW1962
-# T citroni: GW1963 till GW1984 inclusive
+#T aurantium: GW1941 till GW1951 inclusive + GW1984 (12 SAMPLES)
+#T meloni: GW1952 till GW1962 +GW1982 +GW1983 (13 SAMPLES)
+# T citroni: GW1963 till GW1981 inclusive (19 SAMPLES)
 
 #group vectors for non bactloadCorrected datasets
-num_groups<-c(1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3)
-label_groups<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci")
+num_groups<-c(1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,2,1)
+label_groups<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau")
 
 head(d18s_matrix)
 dim(d18s_matrix)
 nmds<-metaMDS(t(d18s_matrix[,-c(45,46,47)]), try=50)
 
-png("Figures/18splots/ordi_nmds_18s.png",units="cm",height=15,width=15,res=300)
+png("Figures/18splots/ordi_nmds_18s2.png",units="cm",height=30,width=30,res=300)
 plot(nmds, type = "t", display="sites")
 
 points(nmds, col=num_groups, cex=1.5, pch=16)
@@ -72,11 +72,9 @@ hist(x$perm)
 abline(v=x$statistic)
 
 #vector 
-species_vector<-data.frame(Species=c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci"))
+species_vector<-data.frame(Species=c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau"))
 
 #wFreqs_more50Counts % more1PctCounts
-#temp_treatments<-data.frame(Condition=c("C","C","C","T","T","C","C","C","T","C","C","T","C","C","C","T")
-#                           , Sponge_type=c("G","G","G","G","G","G","G","G","G","P","P","P","P","P","P","P"))
 
 #adonis(t(bact_matrix)~Condition, data=temp_treatments, strata=temp_treatments$Sponge_type)
 bact_cca<-cca(t(d18s_matrix[,-c(45,46,47)])~Species, data=species_vector)
@@ -107,7 +105,7 @@ matrix_zscores<-((xd18s_matrix[,-c(45,46,47)]-matrix_rMeans)/matrix_rSds)
 OTUVars<-sort(rowVars(xd18s_matrix[,-c(45,46,47)],useNames = T),decreasing = T)
 
 png("Figures/18splots/heatmap_all_18s.png",units="cm",height=30,width=20,res=300)
-heatmap(as.matrix(matrix_zscores),ColSideColors = c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue"))
+heatmap(as.matrix(matrix_zscores),ColSideColors = c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","red","red","green"))
 dev.off()
 variability<-rowVars(xd18s_matrix[,-c(45,46,47)])
 OTUVars<-cbind(d18s_matrix[,-c(45,46,47)],variability)

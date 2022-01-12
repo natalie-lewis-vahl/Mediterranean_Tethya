@@ -1,5 +1,6 @@
 library(dplyr)
 library(ggplot2)
+library(grDevices)
 taxa<-read.table("./Data/18s/taxa_fixed18s.csv",header=TRUE,sep=",")
 otus<-read.table("./Data/18s/all.otutab.csv",sep="\t")
 names(taxa)
@@ -17,11 +18,11 @@ xmerged<-cbind(xmerged,count)
 xfiltered<-xmerged[!(xmerged$sequence_identifier=="OTU_1"|xmerged$sequence_identifier=="OTU_2"),]
 
 #Remove OTUS with less than 5 reads
-filtered<-xfiltered[xfiltered$count>5,]
+filtered<-xfiltered[xfiltered$count>=5,]
 filtered[filtered==""]<-"Unclassified"
 
 plot1data<-filtered%>%
-  count(Phylum)
+  dplyr::count(Phylum)
 
 data<-plot1data$n
 names(data)<-plot1data$Phylum
@@ -36,10 +37,12 @@ barplot(data2)
 #delete row with unclassified phyla
 filtered<-filtered[!(filtered$Phylum=="Unclassified"),]
 counts<-table(filtered$Class,filtered$Phylum)
-jpeg("./Figures/18splots/overall18s_taxa_distribution.jpeg",units="in", width=15, height=5, res=300)
+png("./Figures/18splots/overall18s_taxa_distribution.png",units="in", width=15, height=5, res=300)
 barplot(counts,xlab="Phyla",ylab="Number of OTUs",cex.names= 0.5,ylim=c(0,25))
 dev.off()
-??barplot
+svg("./Figures/18splots/overall18s_taxa_distribution.svg",width=15, height=5)
+barplot(counts,xlab="Phyla",ylab="Number of OTUs",cex.names= 0.5,ylim=c(0,25))
+dev.off()
 
 unique(filtered$Class[filtered$Phylum=="Annelida"])
 length(filtered$Class=="Polychaeta"~filtered$Phylum=="Annelida")

@@ -4,6 +4,7 @@ library(dplyr)
 library(vegan)
 library(reshape2)
 library(tidyr)
+library(grDevices)
 #ENter data and order the data frames
 taxa<-read.csv("./Data/18s/taxa_fixed18s.csv",sep=",")
 unique(taxa$Phylum)
@@ -17,24 +18,25 @@ plotsPath<-"./Figures/18splots"
 #prep data set for calculations
 oat<-bind_cols(otus[order(otus$X.OTU.ID),], taxa[order(taxa$sequence_identifier),])
 
+
+countSum<-apply(oat[2:45],1,sum)#sum the rows
+oatsum<-cbind(oat,countSum)
+#Filter for OTUs with more than 5 reads
+oat<-oatsum[oatsum$countSum>=5,]
+
 #Filtering for 95 percent
-#countSum<-apply(oat[2:45],1,sum)#sum the rows
-
 #pct<-countSum/sum(countSum)
-
-#oatsum<-cbind(oat, countSum, pct)
+#oatsum<-cbind(oatsum, pct)
 #oatsum[desc(oatsum$pct),]
 #oatx<-oatsum%>%
 #  arrange(desc(pct))
 #oat<-oatx%>%
 #  mutate(cumpct=cumsum(pct))
-#dim(oatx)
-#dim(oat)
-
 #oat<-oat[oat$cumpct < 0.95,]
-
-##OR get rid of reads less than 3
-oat<-oat[oat$size>4,]
+#remove columns for cumpct and pct
+#oat<-oat[,-c(58,59)]
+#remove column cumsum
+oat<-oat[,-57]
 
 #FIlter out bacteria
 oat<-oat%>%filter(Domain!="Bacteria")
@@ -50,8 +52,9 @@ oat<-oat[-c(1,85),]
 oat[oat==""]<-"Unclassified"
 #Find last sample column
 which(colnames(oat)=="GW1984")
-
+head(oat)
 #Melt table to make phylum ID
+#remove all columns except OTU ID, samples and phyla
 oatmelt<-melt(oat[-c(46:50,52:56)])
 #Make each variable (sample names) a level
 levels(oatmelt$variable)<-c("GW1941","GW1942" ,"GW1943","GW1944", "GW1945", "GW1946", "GW1947", "GW1948","GW1949","GW1950","GW1951",
@@ -60,13 +63,16 @@ levels(oatmelt$variable)<-c("GW1941","GW1942" ,"GW1943","GW1944", "GW1945", "GW1
 #Assign species names to each sample via the levels
 levels(oatmelt$variable)<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau",
                             "Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme",
-                            "Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci")
+                            "Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci",
+                            "Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau")
 
 #Group by species and calc relative abundance of each OTU for each species
 zoatmelt<-oatmelt%>%
   group_by(variable)%>%
   summarise(relative_abundance=value/sum(value))
-dim(zoatmelt)
+#Check relative abundances add up to 1 for each sp
+sum(zoatmelt$relative_abundance[zoatmelt$variable=="Tci"])
+head(zoatmelt)
 #Bind the "relative_abundance" col (for each sp seperately) to the main data set
 dataset<-cbind(oatmelt,zoatmelt[2])
 unique(oat$Phylum)
@@ -93,14 +99,14 @@ Brachiopoda<-"steelblue2"
 Chordata<-"slategray"
 
 ####
-
-ggplot(dataset, aes(variable, y=relative_abundance)) + geom_col(aes(fill=Phylum),position="stack") +
+View(dataset)
+ggplot(dataset, aes(variable, y=value,fill=Phylum)) + geom_bar(position="fill",stat="identity")+
   scale_fill_manual(values = c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,Chordata,
                                Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
                                Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                Rhodophyta,Unclassified))+
   labs(x="Species",y="Relative abundance")+scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citroni)))+theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
-ggsave("relative_abundances_18s.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
+ggsave("relative_abundances_18s.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
 
 #REpeat but without unclassified and porifera OTUS 
 boatmelt<-oatmelt[oatmelt$Phylum!="Unclassified"&oatmelt$Phylum!="Porifera",]
@@ -113,13 +119,13 @@ bboatmelt<-boatmelt%>%
 #Bind the "relative_abundance" col (for each sp seperately) to the main data set
 bdataset<-cbind(boatmelt,bboatmelt[2])
 #
-ggplot(bdataset, aes(variable, y=relative_abundance)) + geom_col(aes(fill=Phylum),position="stack") +
+ggplot(bdataset, aes(variable, y=relative_abundance)) + geom_col(aes(fill=Phylum),position="fill") +
   scale_fill_manual(values = c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,Chordata,
                                Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
                                Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                Rhodophyta,Unclassified))+
   labs(x="Species",y="Relative abundance")+scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citroni)))+theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
-ggsave("relative_abundances_18s_wo_unclassandporifera.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
+ggsave("relative_abundances_18s_wo_unclassandporifera.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
 
 
 unique(oat$Domain)
@@ -135,15 +141,18 @@ ggplot(otucount, aes(x=Numb_otu,y=Phylum))+geom_col(fill=c(Annelida,Arthropoda,B
                                                                                   Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
                                                                                   Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                                                                   Rhodophyta,Unclassified))+labs(x="Number of OTUs",y="Phylum")+theme_bw()
-ggsave("Freq_of_otu.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
+ggsave("Freq_of_otu.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
 #WIhtout unclassified
 
 botu_count<-otucount[(otucount$Phylum!="Unclassified"),]
+svg(filename="Figures/18splots/Freq_of_otu_wo_unclass.svg",width=30,height=10)
 
 ggplot(botu_count, aes(y=Numb_otu,x=Phylum))+geom_col(fill=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,Chordata,
                                                            Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
                                                            Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
-                                                           Rhodophyta))+labs(x="Number of OTUs",y="Phylum")+theme_bw()
+                                                           Rhodophyta))+labs(x="Phylum",y="Number of OTUs")+theme_bw()
+
+dev.off()
 str(oatmelt)
 #Make each variable (sample names) a level
 levels(oatmelt$variable)<-c("GW1941","GW1942" ,"GW1943","GW1944", "GW1945", "GW1946", "GW1947", "GW1948","GW1949","GW1950","GW1951",
@@ -152,7 +161,7 @@ levels(oatmelt$variable)<-c("GW1941","GW1942" ,"GW1943","GW1944", "GW1945", "GW1
 #Assign species names to each sample via the levels
 levels(oatmelt$variable)<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau",
                             "Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme",
-                            "Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci")
+                            "Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau")
 
 ####Group by phylum and also species
 botucount<-oatmelt%>%
@@ -164,14 +173,6 @@ botucount<-oatmelt%>%
 #  summarise(tau_Numb_otu=n[variable=="Tau"],tme_Numb_otu=n[variable=="Tme"],Tci_Numb_otu=n[variable=="Tci"])
 
 botu_count<-botucount[(botucount$Phylum!="Unclassified"),]
-###HEREEEE
-ggplot(botu_count)+
-  geom_bar(aes(y=value,fill=c(Tau,Tme,Tci))+
-  geom_col(fill=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,Chordata,
-  Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
-  Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
-  Rhodophyta))+labs(x="Number of OTUs",y="Phylum")+theme_bw()
-ggsave("Freq_of_otu_wo_unclass.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
 
 #BUbble plot for comparing, richness and abundance of phylums across species
 unique(bdataset$Phylum)
@@ -195,7 +196,7 @@ ggplot(bubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
                                          Kinorhyncha,Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                          Rhodophyta,Unclassified))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
   scale_size(range = c(.7,20))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ theme(axis.text.x = element_text(face = "italic"))
-ggsave("phylum_richness_and_abundance_bubble.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
+ggsave("phylum_richness_and_abundance_bubble.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
 #WIthout unclassified, porifera and ciliophora
 bubble2<-bubbledata[(bubbledata$Phylum!="Unclassified"&bubbledata$Phylum!="Porifera"),]
 bubble2<-bubble2[(bubble2$Phylum!="Ciliophora"),]
@@ -205,7 +206,7 @@ ggplot(bubble2,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
                               Kinorhyncha,Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,
                               Rhodophyta))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
   scale_size(range = c(.7,20))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ theme(axis.text.x = element_text(face = "italic"))
-ggsave("phylum_rich_and_abund_bubble_withoutunclass-cill-porifera.png",path=plotsPath,dpi=300,units="cm",width="30",height="20")
+ggsave("phylum_rich_and_abund_bubble_withoutunclass-cill-porifera.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
 #TO LOOK AT RICHNESS AS THE SIZE Instead and ABUNDANCE on y axis
 #ggplot(bubble2,aes(x=variable,y=abundance,color=Phylum,size=Numb_otu))+
 #  scale_color_manual(values=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,
