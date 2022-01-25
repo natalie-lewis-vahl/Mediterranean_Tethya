@@ -65,6 +65,7 @@ core_community<-OTUPresence%>%
   dplyr::filter(sumtau>=0.90 |sumtme>=0.90 | sumtci>=0.90) #52 in total
 list(core_community$sequence_identifier)
 nrow(core_community)
+
 #or
 cc_all<-OTUPresence%>%
   filter(sumall>= 0.90)%>%
@@ -106,7 +107,7 @@ venn.diagram(
   width = 500 , 
   resolution = 300,
   compression = "lzw",
-  main="Core bacterial communities across and between species",
+  main="16s Core communities across and between species",
   main.fontfamily="sans",
   main.cex=0.35,
   main.fontface = "bold",
@@ -131,7 +132,7 @@ venn.diagram(
   rotation = 1
 )
 
-#Calculating the raltive abundance of phyla cross species
+#Calculating the relative abundance of phyla cross species
 
 #Calculating the relative abundance of phyla cross species
 
@@ -205,7 +206,6 @@ xnoncoredatamelt<-noncoredatamelt%>%
 noncoredataset<-cbind(noncoredatamelt,xnoncoredatamelt[2])
 
 ##########
-
 unique(dataset$Phylum)
 ################
 AcidobacteriotaCol<-"yellowgreen"
@@ -222,7 +222,7 @@ DeferrisomatotaCol<-"turquoise3"
 DeinococcotaCol<-"turquoise"
 #DependentiaeCol<-"tomato3"                 
 DesulfobacterotaCol<-"tomato1"   
-EntotheonellaeotaCol<-"thistle4"   
+EntotheonellaeotaCol<-"Violetred4"   
 #FirmicutesCol<-"black"                    
 #FusobacteriotaCol<-"rosybrown3"               
 GemmatimonadotaCol<-"tan3"
@@ -233,12 +233,12 @@ NB1jCol<-"springgreen4"
 NitrospinotaCol<-"springgreen2"
 NitrospirotaCol<-"slategray2"
 #PAUC34fCol<-"slateblue"
-PlanctomycetotaCol<-"slategray"
+PlanctomycetotaCol<-"purple4"
 ProteobacteriaCol<-"salmon"
 SAR324cladeCol<-"royalblue"
 SpirochaetotaCol<-"tan4"
 #SumerlaeotaCol<-"red2"
-UnclassifiedCol<-"purple4"
+UnclassifiedCol<-"slategray"
 VerrucomicrobiotaCol<-"purple"
 #WPS2Col<-"plum3"
 #WS1Col<-"orange"

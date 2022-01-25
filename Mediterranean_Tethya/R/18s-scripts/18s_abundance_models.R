@@ -130,7 +130,7 @@ png("Figures/18splots/phylumRADplot.png",res=300,units="cm",width=30,height=30)
 phylumRADPlot
 dev.off()
 s5rad<-radfit(t(as.data.frame(abundanceByPhylumBySample)[,5]))
-View(abundanceByPhylumBySample)
+head(abundanceByPhylumBySample)
 ##############3
 
 #For specie T. auratis
@@ -327,7 +327,7 @@ dev.off()
 s2otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(3)]))
 s3otuRADRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(4)]))
 #etc
-View(otuRAD)
+head(otuRAD)
 otuRAD_test<-rad_test(otuRAD, conf.level = 0.95, log = T)
 summary.rad.htest(otuRAD_test)
 print.rad.test(otuRAD_test)
@@ -411,7 +411,7 @@ xs41otuRAD<-rad.zipf(t(cat[c(42)]))
 #Plot everything together
 
 #Plot everything together
-png("./Figures/18splots/xoturad_grouped.png")
+tiff("./Figures/18splots/xoturad_grouped.tiff",width=8,height=8,units="in",res=300)
 par(mfrow=c(3,4))#13650
 #For sp 1
 plot(xs2otuRAD,pch=1,lty=1,col=2,ylim=c(1,13650),xlim=c(0,110))
@@ -519,7 +519,7 @@ dev.off()
 head(cat)
 xotuRAD<-radfit(t(as.data.frame(cat)[,c(2,3,4,6:10,12:21,23:45)]))
 summary(xotuRAD)
-View(xotuRAD)
+head(xotuRAD)
 xotuRAD_test<-rad_test(xotuRAD, conf.level = 0.95, log = T )
 ??rad_test()
 summary.rad.htest(xotuRAD_test)

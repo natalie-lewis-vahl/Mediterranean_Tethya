@@ -176,7 +176,7 @@ s41tciphylumRAD<-rad.lognormal(t(as.data.frame(abundanceByPhylumBySample)[,41]))
 
 #############
 #Plot everything together
-png("Figures/AS_16splots/AS16s_phylumrad_grouped.png",width=40,height=30,units="cm",res=300)
+png("Figures/AS_16splots/AS16s_phylumrad_grouped.png",width=8,height=8,units="in",res=300)
 par(mfrow=c(3,4))
 #For sp 1
 max(s4tauphylumRAD$y)#Maximum for y is 24556
@@ -327,7 +327,7 @@ xotuRAD<-radfit(t(cat[c(2:45)]))
 
 summary(xotuRAD)
 xotuRADPlot<-plot(xotuRAD)
-png("./Figures/AS_16splots/radplototu.png",width=30,height=40,units="cm",res=300)
+png("./Figures/AS_16splots/radplototu.png",width=8,height=8,units="in",res=300)
 xotuRADPlot
 dev.off()
 #For specie T. auratis
@@ -384,7 +384,7 @@ xs41otuRAD<-rad.zipf(t(cat[c(42)]))
 #Plot everything together
 max(xs14otuRAD$y) #16039
 
-png("./Figures/AS_16splots/xoturad_grouped.png",width=40,height=30,units="cm",res=300)
+png("./Figures/AS_16splots/xoturad_grouped.png",width=8,height=8,units="in",res=300)
 par(mfrow=c(3,4))
 #For sp 1
 plot(xs44otuRAD,col=6,ylim=c(1,16100),xlim=c(0,310))

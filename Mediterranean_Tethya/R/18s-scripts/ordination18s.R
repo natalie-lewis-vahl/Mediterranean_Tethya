@@ -122,14 +122,25 @@ sponges<-d18s_matrix[,-c(45,46,47)]
 
 dis<-vegdist(t(sponges))
 clus<-hclust(dis,"ward.D2")
+par(mfrow=c(1,1))
 plot(clus)
 #single sites to be joined into large clusters
 #or use complete for compact clusters or average -neutral grouping
 den<-as.dendrogram(clus)
+plot(den)
 #ord<-cca(sponges)
 wa<-scores(nmds,display="sites",choices=1)
 oden<-reorder(den,wa,mean)
+#Function vegemite prints text tables where species are rows, and each site takes only one column without spaces
 vegemite(t(sponges),use=oden,zero="-",scale="log")
+#. Function tabasco provides interface for heatmap for a colour image of the data.
 tabasco(t(sponges),use=oden,zero="-",scale="Hill") #HIll is the scale publication standard
 
-tabasco(t(sponges),use=oden, zero="-",col = heat.colors(5), scale="Hill")
+tabasco(t(sponges),use=oden, zero="-",col = heat.colors(5), scale="Hill",sp.ind=species_vector)
+dune.taxon
+sp_ID<-read.table("Data/species_sample_table.csv",header=TRUE,sep=";")
+names(sp_ID)
+spID<-as.data.frame(sp_ID[,-1])
+rownames(spID)<-sp_ID[,1]
+colnames(spID)<-"species"
+taxontree<-hclust(taxa2dist(spID))

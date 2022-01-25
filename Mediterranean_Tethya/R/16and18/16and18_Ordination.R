@@ -1,15 +1,16 @@
 library(vegan)
 library(matrixStats)
 library(dplyr)
-matrix_file<-"./Data/16and18s_otu.csv"
 
-tus<-arrange(otus, X.OTU.ID)
-taotus<-read.csv("./Data/16and18s_otu.csv", sep=";")
+otus<-read.csv("./Data/16and18s_otu.csv", sep=";")
+head(otus)
+otus<-arrange(otus,X.OTU.ID)
 #BInd taxonomy to remove bacterial OTUs from 18s dataset 
 taxa<-read.csv("./Data/16ans18s_taxa.csv",sep=";")
-head(otus)
+head(taxa)
 taxa<-arrange(taxa,sequence_identifier)
 otu_and_taxa<-bind_cols(otus,taxa)
+#remove bacteria from 18s data set
 otu_and_taxa<-otu_and_taxa%>%filter(!(Domain=="Bacteria" & dataset=="18s"))
 
 #and remove two otus fromcoamplified sponges for 18s
@@ -27,38 +28,40 @@ coamplif_sponge$sequence_identifier[2]#OTU_4206
 otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4206"),]
 
 #fILTER TO KEEP TOP 95%
-pct<-otus_and_taxa$countSum/sum(otus_and_taxa$countSum)
-otus_and_taxab<-cbind(otus_and_taxa, pct)
-otus_and_taxac<-otus_and_taxab%>%
-  arrange(desc(pct))
-otus_and_taxac<-otus_and_taxac%>%
-  mutate(cumpct=cumsum(pct))
+#pct<-otus_and_taxa$countSum/sum(otus_and_taxa$countSum)
+#otus_and_taxab<-cbind(otus_and_taxa, pct)
+#otus_and_taxac<-otus_and_taxab%>%
+#  arrange(desc(pct))
+#otus_and_taxac<-otus_and_taxac%>%
+#  mutate(cumpct=cumsum(pct))
+
 #filtering: should be done seperate for both 16 and 18s data set
 #Keep rows that have more than 50 counds and are from 16s data set OR have more than 5 counts and belong to 18s ddataset
-otus_and_taxad<-otus_and_taxac[otus_and_taxac$countSum > 50 & otus_and_taxac$dataset=="16s"|otus_and_taxac$countSum > 5 & otus_and_taxac$dataset=="18s",]
-View(otus_and_taxac)
+otus_and_taxad<-otus_and_taxa[otus_and_taxa$countSum >= 50 & otus_and_taxa$dataset=="16s"|otus_and_taxa$countSum >= 5 & otus_and_taxa$dataset=="18s",]
+head(otus_and_taxad)
+dim(otus_and_taxad)
 #otus_and_taxac<-otus_and_taxac[otus_and_taxac$cumpct < 0.95,]
 
-oat<-otus_and_taxad[,-c(1,47:57)]
+oat<-otus_and_taxad[,-c(1,47:55)]
 #rEMOVE SEQUENCE id AS A COLUMN AND MAKE THEM THE ROW NAMES
 row.names(oat)<-oat$X.OTU.ID
 #remove column with id names and taxa columns again
 oat<-oat[,-1]
 
 #groups 
-#T aurantium: GW1941 till GW1951 inclusive 
-#T meloni: GW1952 till GW1962
-# T citroni: GW1963 till GW1984 inclusive
+#T aurantium: GW1941 till GW1951 inclusive +GW1984
+#T meloni: GW1952 till GW1962 +GW1982 + GW1983
+# T citroni: GW1963 till GW1981 inclusive
 
 #group vectors for non bactloadCorrected datasets
-num_groups<-c(1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3)
-label_groups<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci")
+num_groups<-c(1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,2,1)
+label_groups<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau")
 
 head(oat)
 dim(oat)
 nmds<-metaMDS(t(oat), try=50)
 
-tiff("./Figures/16and18splots/ordination_nmds_plot.tiff",height=20,width=20,units="cm",res=300)
+jpeg("./Figures/16and18splots/ordination_nmds_plot.jpeg",height=8,width=8,units="in",res=300)
 
 plot(nmds, type = "t", display="sites")
 
@@ -73,7 +76,7 @@ summary(x)
 x$statistic
 hist(x$perm)
 #vector 
-species_vector<-data.frame(Species=c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci"))
+species_vector<-data.frame(Species=c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau"))
 
 #wFreqs_more50Counts % more1PctCounts
 #temp_treatments<-data.frame(Condition=c("C","C","C","T","T","C","C","C","T","C","C","T","C","C","C","T")
@@ -83,7 +86,7 @@ species_vector<-data.frame(Species=c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","
 meta_cca<-cca(t(oat)~Species, data=species_vector)
 #bact_cca<-cca(t(bact_matrix[-c(17,18)])~Condition+Sponge_type+Condition:Sponge_type, data=temp_treatments)
 
-tiff("./Figures/16and18splots/ordination_cca_plot.tiff",height=20,width=20,units="cm",res=300)
+jpeg("./Figures/16and18splots/ordination_cca_plot.jpeg",height=8,width=8,units="in",res=300)
 
 plot(meta_cca, type="t", display="sites")
 points(meta_cca, col=num_groups, cex=1.5, pch=16)
@@ -108,15 +111,14 @@ OTUVars<-arrange(OTUVars,by="variability")
 variableOTUs<-rownames(head(OTUVars, n=25L))
 
 
-tiff("./Figures/16and18splots/heatmap16and18.tiff",height=30,width=30,units="cm",res=300)
-heatmap(as.matrix(matrix_zscores)) 
+jpeg("./Figures/16and18splots/heatmap16and18.jpeg",height=8,width=8,units="in",res=300)
+heatmap(as.matrix(matrix_zscores),ColSideColors = c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","red","red","green")) 
 dev.off()
-#ColSideColors = c("blue","red","red","blue","blue","blue","blue","red","blue","blue","blue","blue","blue","blue","blue","blue","blue","red","blue","red","red","blue","blue","blue","blue","blue","blue","green","green","red","green","green","red","red","red","blue","blue","green","green","green","green","green","green","green"))
 #here
 
-tiff("./Figures/16and18splots/heatmap16and18.tiff",height=30,width=30,units="cm",res=300)
+jpeg("./Figures/16and18splots/mostvariable25_heatmap16and18.jpeg",height=8,width=8,units="in",res=300)
 
-heatmap(matrix_zscores[rownames(matrix_zscores) %in% variableOTUs,])
+heatmap(matrix_zscores[rownames(matrix_zscores) %in% variableOTUs,],ColSideColors = c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","red","red","green"))
 
 dev.off()
 
