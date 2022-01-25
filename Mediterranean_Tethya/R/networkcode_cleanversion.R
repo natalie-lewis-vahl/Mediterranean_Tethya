@@ -3,14 +3,15 @@ library(dplyr)
 library(tibble)
 library(ggdendro)
 library(corrgram)
-
+library(ggplot2)
+library(bootnet)
 #just 16s
-CountsPath<-"./Data/16s_allsamples_otu.csv"
 otuTaxonomyPath<-"./Data/16s_allsamples_taxa.csv"
 #Need to remove sample GW1956 because of low sampling -> the 16th sample
 #belonging to Tme
-otutable<-read.csv(CountsPath, sep="\t")
+otutable<-read.table("./Data/16s_allsamples_otu.txt", header=TRUE)
 taxatable<-read.csv(otuTaxonomyPath, sep=";")
+ls()
 #reorder otu to match taxa
 #get OTU counts and add them to DF
 countSum<-apply(otutable[-1],1,sum)
@@ -84,11 +85,13 @@ counts_tci<- tcimatrix_abund[ ,which((names(tcimatrix) %in% active_otustci)==TRU
 #Note that the log-ratio transformation, by its nature, fails if the input data contain any zero values. 
 #By default, this function replaces all zero values with 1. Alternatively, the user may set the parameter `alpha` greater than zero to approximate log-ratios in the presence of zeros (via the Box-Cox transformation). However, the topic of zero replacement is controversial. Proceed carefully when analyzing data that contain zero values.
 rho <- propr(counts_tci, metric = "rho","clr", alpha=NA,p=100)
-best <- rho[">", .60]
+best <- rho[">", .70]
 plot(best)
 dendrogram(best)
-best<-propr::simplify(best)
 pca(best)
+rhomatrixbest<-getMatrix(best)
+best<-propr::simplify(best)
+
 #
 getAdj(rho)
 rhomatrix<-getMatrix(rho)
@@ -97,11 +100,10 @@ max(rhomatrix)
 min(rhomatrix)
 
 tiff("Figures/Networks/Tcitrina16s_rho.tiff",res=300,units="cm",width=30,height=25)
-corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in T citrina 16s samples ",
+corrgram(rhomatrixbest,order=TRUE,main="Rho proportionality between OTUs present in T citrina 16s samples ",
          lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
 dev.off()
 ########################
-#not enough
 ##Tethy aurantium
 dim(xmatrix)
 taumatrix<-xmatrix[c(1:11,43),]
@@ -145,6 +147,7 @@ corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in 
 dev.off()
 #no results
 ##########################
+
 ##############
 ###############
 #Network for 18s data
@@ -302,6 +305,7 @@ otu_table$sponge <- c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau
 #GET NAMES OF ALL OUTS
 otu_table
 otus <- names(otu_table)
+head(otu_table)
 #PUT SAMPLES BACK AS A ROW
 otu_table<-tibble::rownames_to_column(otu_table, "Sample")
 xmatrix <- otu_table[,grep('OTU', names(otu_table))] 
@@ -335,8 +339,8 @@ dev.off()
 #####
 #For T meloni
 dim(xmatrix)
-tmematrix<-xmatrix[c(12:21,41),]
-tmematrix_abund<-fullmatrix[c(12:21,41),]
+tmematrix<-xmatrix[c(12:21,40,41),]
+tmematrix_abund<-fullmatrix[c(12:21,40,41),]
 
 otu_samplestme <- colSums(tmematrix)
 #present in more than 90%
@@ -353,4 +357,53 @@ rhomatrix<-getMatrix(rho)
 tiff("Figures/Networks/Tmerantium16sand18s_rho.tiff",res=300,units="cm",width=20,height=20)
 corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in T meloni 16s and 18s samples ",
          lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
+dev.off()
+
+##For T citrina
+dim(xmatrix)
+tcimatrix<-xmatrix[c(22:39),]
+tcimatrix_abund<-fullmatrix[c(22:39),]
+
+otu_samplestci <- colSums(tcimatrix)
+#present in more than 90%
+active_otustci <- names(otu_samplestci[otu_samplestci > 16])
+filteredmat_tci<- tcimatrix_abund[ ,which((names(tcimatrix) %in% active_otustci)==TRUE)]
+head(filteredmat_tci) 
+
+##
+rhotci <- propr(filteredmat_tci, metric = "rho","clr", alpha=NA,p=100)
+best <- rho[">", .60]
+plot(best)
+#
+rhomatrixtci<-getMatrix(rhotci)
+
+tiff("Figures/Networks/Tciaurantium16sand18s_rho.tiff",res=300,units="cm",width=20,height=20)
+corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in T citrina 16s and 18s samples ",
+         lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
+dev.off()
+
+## Visual Network
+library(igraph)
+library(tidygraph)
+links_tci<-as_data_frame(graph_from_adjacency_matrix(rhomatrixtci,weighted=TRUE))
+otus_tci<-names(filteredmat_tci)
+dataset_tci<-rep("dataset16s",49)
+nodes_tci<-cbind(otus_tci,dataset_tci)
+head(links_tci)
+net<-graph.data.frame(links_tci,nodes_tci,directed=F)
+plot(net)
+net <-simplify(net, remove.multiple = F, remove.loops = T)
+head(links_tci)
+links_tci_filter1<-links_tci[links_tci$weight>0.5,]
+links_tci_filter2<-links_tci[links_tci$weight<(-0.5),]
+links_tcix<-rbind(links_tci_filter1,links_tci_filter2)
+net<-graph.data.frame(links_tcix,nodes_tci,directed=F)
+
+deg <-degree(net, mode="all")
+head(nodes_tci)
+colrs <-c("green", "yellow") 
+V(net)$color <-colrs[V(net)$dataset_tci]
+E(net)$width <-E(net)$weight/6
+png("networkdiagramtci.png",units="in",width=8,height=8,res=300)
+plot(net,vertex.size=20,vertex.label.colour="black",pt.bg=colrs)
 dev.off()
