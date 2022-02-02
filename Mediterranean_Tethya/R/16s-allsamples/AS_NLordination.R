@@ -3,7 +3,7 @@ library(matrixStats)
 library(dplyr)
 matrix_file<-"./Data/16s_allsamples_otu.csv"
 
-bact_matrix<-read.csv(matrix_file, head=T, sep="\t", row.names=1)
+bact_matrix<-read.csv(matrix_file, head=T, sep=";", row.names=1)
 countSum<-apply(bact_matrix,1,sum)#sum the rows
 pct<-countSum/sum(countSum)
 
@@ -39,11 +39,11 @@ label_groups<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau
 nmds<-metaMDS(t(bact_matrix[,-c(45:47)]), try=50)
 
 #With previous incomplete data set got filtered data get Warning message: stress is (nearly) zero: you may have insufficient data
-png("./Figures/AS_16splots/nmdsplot_16s.png",height=30,width=30,units="cm",res=300)
+png("./Figures/AS_16splots/nmdsplot_16s.png",height=8,width=8,units="in",res=300)
 
 plot(nmds, type = "t", display="sites")
 
-points(nmds, col=num_groups, cex=1.5, pch=16)
+points(nmds, col=c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"), cex=1.5, pch=16)
 
 ordispider(nmds, label_groups, label=T)
 dev.off()
@@ -58,10 +58,10 @@ species_vector<-data.frame(Species=c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","
 ??cca
 bact_cca<-cca(t(bact_matrix[,-c(45:47)])~Species, data=species_vector)
 #bact_cca<-cca(t(bact_matrix[-c(17,18)])~Condition+Sponge_type+Condition:Sponge_type, data=temp_treatments)
-png("./Figures/AS_16splots/ccaplot_16s.png",height=20,width=20,units="cm",res=300)
+png("./Figures/AS_16splots/ccaplot_16s.png",height=8,width=8,units="in",res=300)
 
 plot(bact_cca, type="t", display="sites")
-points(bact_cca, col=num_groups, cex=1.5, pch=16)
+points(bact_cca, col=c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"), cex=1.5, pch=16)
 ordispider(bact_cca, label_groups, label=T)
 dev.off()
 summary(bact_cca)
@@ -82,20 +82,20 @@ coreOnlyCounts<-bact_matrix[rownames(bact_matrix[,-c(45:47)]) %in% as.character(
 corenmds<-metaMDS(t(bact_matrix[rownames(bact_matrix[,-c(45:47)]) %in% as.character(coreOTUs),-c(45:47)]))
 
 #With previous incomplete data set got filtered data get Warning message: stress is (nearly) zero: you may have insufficient data
-png("./Figures/AS_16splots/nmdsplot_core16s.png",height=20,width=20,units="cm",res=300)
+png("./Figures/AS_16splots/nmdsplot_core16s.png",height=8,width=8,units="in",res=300)
 
 plot(corenmds, type = "t", display="sites")
 
-points(corenmds, col=num_groups, cex=1.5, pch=16)
+points(corenmds, col=c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"), cex=1.5, pch=16)
 
 ordispider(corenmds, label_groups, label=T)
 dev.off()
 #cca plot
 core_cca<-cca(t(coreOnlyCounts)~Species, data=species_vector)#correspondence analysis,
 
-png("./Figures/AS_16splots/ccaplot_core16s.png",height=20,width=20,units="cm",res=300)
+png("./Figures/AS_16splots/ccaplot_core16s.png",height=8,width=8,units="in",res=300)
 plot(core_cca, type="t", display="sites")
-points(core_cca, col=num_groups, cex=1.5, pch=16)
+points(core_cca, col=c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"), cex=1.5, pch=16)
 ordispider(core_cca, label_groups, label=T)
 dev.off()
 anova(core_cca)
@@ -105,20 +105,20 @@ anova(core_cca)
 noncorenmds<-metaMDS(t(bact_matrix[!(rownames(bact_matrix[,-c(45:47)]) %in% as.character(coreOTUs)),-c(45:47)]))
 
 #With previous incomplete data set got filtered data get Warning message: stress is (nearly) zero: you may have insufficient data
-png("./Figures/AS_16splots/nmdsplot_noncore16s.png",height=20,width=20,units="cm",res=300)
+png("./Figures/AS_16splots/nmdsplot_noncore16s.png",height=8,width=8,units="in",res=300)
 
 plot(noncorenmds, type = "t", display="sites")
 
-points(noncorenmds, col=num_groups, cex=1.5, pch=16)
+points(noncorenmds, col=c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"), cex=1.5, pch=16)
 
 ordispider(noncorenmds, label_groups, label=T)
 dev.off()
 #cca
 nonCoreCounts<-bact_matrix[!(rownames(bact_matrix[,-c(45:47)]) %in% as.character(coreOTUs)),-c(45:47)]
 nonCore_cca<-cca(t(nonCoreCounts)~Species, data=species_vector)
-png("./Figures/AS_16splots/ccaplot_noncore16s.png",height=20,width=20,units="cm",res=300)
+png("./Figures/AS_16splots/2ccaplot_noncore16s.png",height=8,width=8,units="in",res=300)
 plot(nonCore_cca, type="t", display="sites")
-points(nonCore_cca, col=num_groups, cex=1.5, pch=16)
+points(nonCore_cca, col=c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"), cex=1.5, pch=16)
 ordispider(nonCore_cca, label_groups, label=T)
 dev.off()
 anova(nonCore_cca)
@@ -137,8 +137,8 @@ bact_matrix_rSds<-rowSds(xbact_matrix)
 bact_matrix_zscores<-((xbact_matrix-bact_matrix_rMeans)/bact_matrix_rSds)
 
 
-png("./Figures/AS_16splots/heatmap_variability_16s_allotus.png",height=30,width=30,units="cm",res=300)
-heatmap(as.matrix(bact_matrix_zscores),ColSideColors = c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","red","red","green"))
+png("./Figures/AS_16splots/heatmap_variability_16s_allotus.png",height=8,width=8,units="in",res=300)
+heatmap(as.matrix(bact_matrix_zscores),ColSideColors =c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"))
 dev.off()
 #Heat map with 25 most variable OTUs
 variability<-rowVars(xbact_matrix)
@@ -146,6 +146,6 @@ OTUVars<-cbind(bact_matrix,variability)
 OTUVars<-arrange(OTUVars,by="variability")
 variableOTUs<-rownames(head(OTUVars, n=25L))
 
-png("./Figures/AS_16splots/heatmap_25mostvariable_otus.png",height=30,width=30,units="cm",res=300)
-heatmap(as.matrix(bact_matrix_zscores[rownames(bact_matrix_zscores) %in% variableOTUs,]),ColSideColors = c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","red","red","green"))
+png("./Figures/AS_16splots/heatmap_25mostvariable_otus.png",height=8,width=8,units="in",res=300)
+heatmap(as.matrix(bact_matrix_zscores[rownames(bact_matrix_zscores) %in% variableOTUs,]),ColSideColors =c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"))
 dev.off()

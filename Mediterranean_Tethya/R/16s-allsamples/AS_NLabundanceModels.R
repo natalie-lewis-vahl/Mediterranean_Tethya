@@ -81,9 +81,8 @@ summary.rad.htest<-function (x, ...)
 ###########################
 
 taxa<-read.csv("./Data/16s_allsamples_taxa.csv",sep=";")
-otus<-read.csv("./Data/16s_allsamples_otu.csv", sep="\t")
-otus<-arrange(otus, X.OTU.ID)
-taxa<-arrange(taxa,sequence_identifier)
+otus<-read.csv("./Data/16s_allsamples_otu.csv", sep=";")
+
 
 plotsPath<-"./Figures/AS_16splots/"
 
@@ -94,6 +93,7 @@ plotsPath<-"./Figures/AS_16splots/"
 countSum<-apply(otus[-1],1,sum)
 countsDF<-cbind(otus, countSum)
 head(countsDF)
+head(taxa)
 #bind otu and taxonomy
 cat<-bind_cols(countsDF[order(countsDF$X.OTU.ID),], taxa[order(taxa$sequence_identifier),])
 head(cat)
@@ -491,9 +491,7 @@ plot.new()
 dev.off()
 
 #head(cat)
-xotuRAD<-radfit(t(cat[c(2:13,15:45)]))
-summary(xotuRAD)
-
+xotuRAD<-radfit(t(cat[,c(2:14,16:45)]))
 xotuRAD_test<-rad_test(xotuRAD, conf.level = 0.95, log = T )
 summary.rad.htest(xotuRAD_test)
 
@@ -502,5 +500,4 @@ par(mfrow=c(1,2),mai=c(1,1,1,1))
 plot.rad.test(xotuRAD_test)
 plot.rad.test(xotuRAD_test, "post.hoc")
 dev.off()
-
 

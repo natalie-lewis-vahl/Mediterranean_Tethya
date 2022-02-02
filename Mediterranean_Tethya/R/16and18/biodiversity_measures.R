@@ -25,12 +25,12 @@ coamplif_sponge<-otus_and_taxa[otus_and_taxa$dataset=="18s",]%>%
 #
 coamplif_sponge$sequence_identifier[1]#OTU_4076
 otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4076"),]
-coamplif_sponge$sequence_identifier[2]#OTU_4206
-otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4206"),]
+coamplif_sponge$sequence_identifier[2]#OTU_4077
+otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4077"),]
 
 #filtering: should be done seperate for both 16 and 18s data set
 #Keep rows that have more than 50 counds and are from 16s data set OR have more than 5 counts and belong to 18s ddataset
-otus_and_taxab<-otus_and_taxa[otus_and_taxa$countSum > 50 & otus_and_taxa$dataset=="16s"|otus_and_taxa$countSum > 5 & otus_and_taxa$dataset=="18s",]
+otus_and_taxab<-otus_and_taxa[otus_and_taxa$countSum >= 50 & otus_and_taxa$dataset=="16s"|otus_and_taxa$countSum >= 5 & otus_and_taxa$dataset=="18s",]
 head(otus_and_taxab)
 data_all<-otus_and_taxab
 head(data_all)
@@ -85,6 +85,7 @@ data_16<-as.matrix(t(data_16))
 H<-diversity(data_16)
 richness<-specnumber(data_16)
 species<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau")
+spcols<-c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green")
 evenness<-H/log(richness)#Peilous richness
 alpha<-cbind(shannon=H, richness=richness, pielou=evenness,species)
 alpha<-as.data.frame(alpha)
@@ -93,21 +94,21 @@ alpha$shannon<-as.numeric(alpha$shannon)
 alpha$richness<-as.numeric(alpha$richness)
 alpha$pielou<-as.numeric(alpha$pielou)
 
-shanplot16<-ggplot(alpha,aes(species,shannon,colour=species))+
+shanplot16<-ggplot(alpha,aes(species,shannon,colour=spcols))+
   geom_point()+
   ylab("Shannon's H'") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
-richplot16<-ggplot(alpha,aes(species,richness,colour=species))+
+richplot16<-ggplot(alpha,aes(species,richness,colour=spcols))+
   geom_point()+
   ylab("Species richness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
-pielouplot16<-ggplot(alpha,aes(species,pielou,colour=species))+
+pielouplot16<-ggplot(alpha,aes(species,pielou,colour=spcols))+
   geom_point()+
   ylab("Pielou's evenness") + 
   xlab("" )+
@@ -130,21 +131,21 @@ alpha18$shannon<-as.numeric(alpha18$shannon)
 alpha18$richness<-as.numeric(alpha18$richness)
 alpha18$pielou<-as.numeric(alpha18$pielou)
 
-shanplot18<-ggplot(alpha18,aes(species,shannon,colour=species))+
+shanplot18<-ggplot(alpha18,aes(species,shannon,colour=spcols))+
   geom_point()+
   ylab("Shannon's H'") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
-richplot18<-ggplot(alpha18,aes(species,richness,colour=species))+
+richplot18<-ggplot(alpha18,aes(species,richness,colour=spcols))+
   geom_point()+
   ylab("Species richness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
-pielouplot18<-ggplot(alpha18,aes(species,pielou,colour=species))+
+pielouplot18<-ggplot(alpha18,aes(species,pielou,colour=spcols))+
   geom_point()+
   ylab("Pielou's evenness") + 
   xlab("" )+
@@ -167,21 +168,21 @@ alphab$shannon<-as.numeric(alphab$shannon)
 alphab$richness<-as.numeric(alphab$richness)
 alphab$pielou<-as.numeric(alphab$pielou)
 
-shanplotb<-ggplot(alphab,aes(species,shannon,colour=species))+
+shanplotb<-ggplot(alphab,aes(species,shannon,colour=spcols))+
   geom_point()+
   ylab("Shannon's H'") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
-richplotb<-ggplot(alphab,aes(species,richness,colour=species))+
+richplotb<-ggplot(alphab,aes(species,richness,colour=spcols))+
   geom_point()+
   ylab("Species richness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
-pielouplotb<-ggplot(alphab,aes(species,pielou,colour=species))+
+pielouplotb<-ggplot(alphab,aes(species,pielou,colour=spcols))+
   geom_point()+
   ylab("Pielou's evenness") + 
   xlab("" )+

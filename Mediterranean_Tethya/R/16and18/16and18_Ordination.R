@@ -65,7 +65,7 @@ jpeg("./Figures/16and18splots/ordination_nmds_plot.jpeg",height=8,width=8,units=
 
 plot(nmds, type = "t", display="sites")
 
-points(nmds, col=num_groups, cex=1.5, pch=16)
+points(nmds, col=c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"), cex=1.5, pch=16)
 
 ordispider(nmds, label_groups, label=T)
 
@@ -112,13 +112,13 @@ variableOTUs<-rownames(head(OTUVars, n=25L))
 
 
 jpeg("./Figures/16and18splots/heatmap16and18.jpeg",height=8,width=8,units="in",res=300)
-heatmap(as.matrix(matrix_zscores),ColSideColors = c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","red","red","green")) 
+heatmap(as.matrix(matrix_zscores),ColSideColors = c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green")) 
 dev.off()
 #here
 
 jpeg("./Figures/16and18splots/mostvariable25_heatmap16and18.jpeg",height=8,width=8,units="in",res=300)
 
-heatmap(matrix_zscores[rownames(matrix_zscores) %in% variableOTUs,],ColSideColors = c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","blue","red","red","green"))
+heatmap(matrix_zscores[rownames(matrix_zscores) %in% variableOTUs,],ColSideColors = c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"))
 
 dev.off()
 

@@ -4,9 +4,9 @@ library(dplyr)
 library(vegan)
 library(reshape2)
 #ENter data and order the data frames
-taxa<-read.csv("./Data/18s/taxa_fixed18s.csv",sep=",")
+taxa<-read.csv("./Data/18s/taxa_fixed18s.csv",sep=";")
 unique(taxa$Phylum)
-otus<-read.csv("./Data/18s/all.otutab.csv", sep="\t")
+otus<-read.csv("./Data/18s/all.otutab.csv", sep=";")
 otus<-arrange(otus, X.OTU.ID)
 taxa<-arrange(taxa,sequence_identifier)
 
@@ -38,11 +38,11 @@ unique(oat$Phylum)
 head(oat)
 #remove otu 1 and 2 because of co-amplification
 #FInd which rows to delete
-which(oat$X.OTU.ID=="OTU_1")
-which(oat$X.OTU.ID=="OTU_2")
+which(oat$X.OTU.ID=="OTU_4076")
+which(oat$X.OTU.ID=="OTU_4077")
 dim(oat)
-#Delete row 1 and 85
-oat<-oat[-c(1,85),]
+#Delete row 1 and 2
+oat<-oat[-c(1,2),]
 oat[oat==""]<-"Unclassified"
 #Find last sample column
 which(colnames(oat)=="GW1984")
@@ -126,3 +126,4 @@ venn.diagram(
   cat.fontfamily = "sans",
   rotation = 1
 )
+

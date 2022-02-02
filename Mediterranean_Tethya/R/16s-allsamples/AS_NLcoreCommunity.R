@@ -17,11 +17,9 @@ uncorrectedCountsPath<-"./Data/16s_allsamples_otu.csv"
 otuTaxonomyPath<-"./Data/16s_allsamples_taxa.csv"
 
 otuTaxonomy<-read.csv(otuTaxonomyPath, sep=";")
-countsDF<-read.csv(uncorrectedCountsPath, sep="\t")
+countsDF<-read.csv(uncorrectedCountsPath, sep=";")
 head(otuTaxonomy)
-data<-cbind(countsDF[order(countsDF$X.OTU.ID),],otuTaxonomy[order(otuTaxonomy$sequence_identifier),])
-head(data)
-unique(data$Phylum)
+data<-cbind(countsDF,otuTaxonomy)
 #If  you want to filter up to 95% abuncance 
 #Alculate pct abundance to filter out the last 5% 
 countSum<-apply(countsDF[2:45],1,sum) #sum the rows
@@ -35,8 +33,9 @@ xdata<-xdata%>%
 #There are more otus with more or equal to 50 reads over the
 #95% cumpct abundance threshold so use at least 50 reads as 
 #filter point instead
-
+dim(xdata)
 xdata<-xdata[xdata$countSum >=50,]
+dim(xdata)
 #Delete the cumpct and pct rows again
 head(xdata)
 xdata=select(xdata,-countSum,-pct,-cumpct)
@@ -61,6 +60,11 @@ OTUPresence<-OTUPresence %>%
 #define core community as present in 90% of samples
 #calculate core communities
 OTUPresence[OTUPresence==""]<-"Unclasssified"
+#Inspect number of OTU per phyla overall
+countsperphyla<-OTUPresence%>%
+  group_by(Phylum)%>%
+  tally()
+##
 core_community<-OTUPresence%>%
   dplyr::filter(sumtau>=0.90 |sumtme>=0.90 | sumtci>=0.90) #52 in total
 list(core_community$sequence_identifier)
@@ -140,6 +144,7 @@ venn.diagram(
 names(xdata)
 
 xdata[xdata==""]<-"Unclasssified"
+unique(xdata$Phylum)
 #Melt data set and remove unnecassary rows
 datamelt<-melt(xdata[-c(1,46,47,49:53)])
 
@@ -211,9 +216,9 @@ unique(dataset$Phylum)
 AcidobacteriotaCol<-"yellowgreen"
 ActinobacteriotaCol<-"yellow2"
 BacteroidotaCol<-"wheat3"
-#BdellovibrionotaCol<-"navyblue"
+BdellovibrionotaCol<-"darkslategray"
 CalditrichotaCol<-"tomato3"
-#CampylobacterotaCol<-"ivory1"
+CampylobacterotaCol<-"wheat1"
 ChloroflexiCol<-"violetred2"
 CrenarchaeotaCol<-"violetred"
 CyanobacteriaCol<-"violet"
@@ -232,7 +237,7 @@ MyxococcotaCol<-"steelblue2"
 NB1jCol<-"springgreen4"
 NitrospinotaCol<-"springgreen2"
 NitrospirotaCol<-"slategray2"
-#PAUC34fCol<-"slateblue"
+PAUC34fCol<-"darkkhaki"
 PlanctomycetotaCol<-"purple4"
 ProteobacteriaCol<-"salmon"
 SAR324cladeCol<-"royalblue"
@@ -240,42 +245,47 @@ SpirochaetotaCol<-"tan4"
 #SumerlaeotaCol<-"red2"
 UnclassifiedCol<-"slategray"
 VerrucomicrobiotaCol<-"purple"
-#WPS2Col<-"plum3"
+WPS2Col<-"plum3"
 #WS1Col<-"orange"
 ######
+library
+??fct_reorder
+unique(dataset$Phylum)
+head(dataset)
+dataset_n<-dataset
+dataset_n$Phylum<-factor(dataset_n$Phylum,levels=c(unique(dataset$Phylum)))
+
 png("./Figures/AS_16splots/relativeabundanceallphyla.png",height=10,width=20,units="cm",res=300)
-ggplot(dataset, aes(variable, y=relative_abundance)) + geom_bar(aes(fill=Phylum),stat="identity", position="fill") + 
-  scale_fill_manual(values = c(AcidobacteriotaCol,ActinobacteriotaCol,BacteroidotaCol,
-                               CalditrichotaCol,ChloroflexiCol,CrenarchaeotaCol,CyanobacteriaCol,
-                               DadabacteriaCol,DeferrisomatotaCol,DeinococcotaCol,DesulfobacterotaCol,
-                               EntotheonellaeotaCol,GemmatimonadotaCol,
-                               LatescibacterotaCol,MyxococcotaCol,NB1jCol,NitrospinotaCol,NitrospirotaCol,
-                               PlanctomycetotaCol,ProteobacteriaCol,SAR324cladeCol,SpirochaetotaCol,
-                               UnclassifiedCol,VerrucomicrobiotaCol)) +
+ggplot(dataset_n, aes(variable, y=relative_abundance,fill=Phylum)) + geom_bar(aes(fill=Phylum),stat="identity", position="fill") + 
+  scale_fill_manual(values = c(ProteobacteriaCol,UnclassifiedCol,CrenarchaeotaCol,ActinobacteriotaCol,BacteroidotaCol,CyanobacteriaCol,PlanctomycetotaCol,        
+                               VerrucomicrobiotaCol,DesulfobacterotaCol,AcidobacteriotaCol,NitrospirotaCol,SpirochaetotaCol,NitrospinotaCol,                
+                               DeferrisomatotaCol,DadabacteriaCol,MyxococcotaCol,SAR324cladeCol,NB1jCol,DeinococcotaCol,ChloroflexiCol,CalditrichotaCol,EntotheonellaeotaCol,LatescibacterotaCol,GemmatimonadotaCol)) +
   labs(x="Species",y="Relative abundance")+
   scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citrina)))+
   theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
 dev.off()
 #Core OTUs
 unique(coredataset$Phylum)
+coredataset_n<-coredataset
+coredataset_n$Phylum<-factor(coredataset_n$Phylum,levels=c(unique(coredataset$Phylum)))
+
 png("./Figures/AS_16splots/relativeabundance-corephyla.png",height=10,width=20,units="cm",res=300)
-ggplot(coredataset, aes(variable, y=relative_abundance)) + geom_bar(aes(fill=Phylum), stat="identity", position="fill") + 
-  scale_fill_manual(values = c(AcidobacteriotaCol, ActinobacteriotaCol, BacteroidotaCol, CrenarchaeotaCol, CyanobacteriaCol,DadabacteriaCol, DesulfobacterotaCol, NitrospirotaCol, PlanctomycetotaCol, ProteobacteriaCol,UnclassifiedCol,VerrucomicrobiotaCol)) +
+ggplot(coredataset_n, aes(variable, y=relative_abundance)) + geom_bar(aes(fill=Phylum), stat="identity", position="fill") + 
+  scale_fill_manual(values = c(CrenarchaeotaCol,UnclassifiedCol, ActinobacteriotaCol, BacteroidotaCol, CyanobacteriaCol,PlanctomycetotaCol, ProteobacteriaCol, DesulfobacterotaCol, NitrospirotaCol,AcidobacteriotaCol,DadabacteriaCol,VerrucomicrobiotaCol)) +
   labs(x="Species",y="Relative abundance")+
   scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citrina)))+
   theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
 dev.off()
 #non core phyla
 unique(noncoredataset$Phylum)
+noncoredataset_n<-noncoredataset
+noncoredataset_n$Phylum<-factor(noncoredataset_n$Phylum,levels=c(unique(noncoredataset$Phylum)))
+
 png("./Figures/AS_16splots/relativeabundance-non-corephyla.png",height=10,width=20,units="cm",res=300)
-ggplot(noncoredataset, aes(variable, y=relative_abundance)) + geom_bar(aes(fill=Phylum), stat="identity", position="fill") + 
-  scale_fill_manual(values = c(AcidobacteriotaCol,ActinobacteriotaCol,BacteroidotaCol,
-                               CalditrichotaCol,ChloroflexiCol,CrenarchaeotaCol,CyanobacteriaCol,
-                               DadabacteriaCol,DeferrisomatotaCol,DeinococcotaCol,DesulfobacterotaCol,
-                               EntotheonellaeotaCol,GemmatimonadotaCol,
-                               LatescibacterotaCol,MyxococcotaCol,NB1jCol,NitrospinotaCol,NitrospirotaCol,
-                               PlanctomycetotaCol,ProteobacteriaCol,SAR324cladeCol,SpirochaetotaCol,
-                               UnclassifiedCol,VerrucomicrobiotaCol)) +
+ggplot(noncoredataset_n, aes(variable, y=relative_abundance)) + geom_bar(aes(fill=Phylum), stat="identity", position="fill") + 
+  scale_fill_manual(values = c(ProteobacteriaCol,UnclassifiedCol,ActinobacteriotaCol,BacteroidotaCol,        
+                               VerrucomicrobiotaCol,DesulfobacterotaCol,AcidobacteriotaCol,SpirochaetotaCol,CyanobacteriaCol,PlanctomycetotaCol,NitrospinotaCol,CrenarchaeotaCol,DeferrisomatotaCol,                
+                               MyxococcotaCol,SAR324cladeCol,NB1jCol,DeinococcotaCol,NitrospirotaCol,DadabacteriaCol,ChloroflexiCol,CalditrichotaCol,EntotheonellaeotaCol,LatescibacterotaCol,GemmatimonadotaCol)) +
   labs(x="Species",y="Relative abundance")+
   scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citrina)))+
   theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
@@ -296,11 +306,14 @@ levels(mcore_otu$variable)<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","T
 
 
 unique(mcore_otu$Phylum)
+nmcore_otu<-mcore_otu
+nmcore_otu$Phylum<-factor(nmcore_otu$Phylum,levels=c(unique(nmcore_otu$Phylum)))
+
 #FOr all species
 png("./Figures/AS_16splots/relativeabundance-otus-betweensp.png",height=10,width=30,units="cm",res=300)
-ggplot(mcore_otu, aes(x=X.OTU.ID, y=value)) + geom_boxplot(aes(fill=Phylum)) + 
+ggplot(nmcore_otu, aes(x=X.OTU.ID, y=value)) + geom_boxplot(aes(fill=Phylum)) + 
   geom_jitter(colour="gray80", alpha=0.65) + facet_grid(cols=vars(variable)) + 
-  scale_fill_manual(values = c(AcidobacteriotaCol,ActinobacteriotaCol, BacteroidotaCol, CrenarchaeotaCol, CyanobacteriaCol,DadabacteriaCol,DesulfobacterotaCol, NitrospirotaCol, PlanctomycetotaCol, ProteobacteriaCol, UnclassifiedCol,VerrucomicrobiotaCol)) +
+  scale_fill_manual(values = c(CrenarchaeotaCol,UnclassifiedCol, ActinobacteriotaCol, BacteroidotaCol, CyanobacteriaCol,PlanctomycetotaCol, ProteobacteriaCol, DesulfobacterotaCol, NitrospirotaCol,AcidobacteriotaCol,DadabacteriaCol,VerrucomicrobiotaCol)) +
   theme_bw() + theme(axis.text.x=element_text(angle=90,hjust=1),legend.position="top",legend.direction="horizontal")
 dev.off()
 #FOr just one sp?
@@ -316,12 +329,15 @@ core_high<-mcore_otu%>%
   arrange(desc(value))%>%
   filter(value>0.1)
 unique(core_high$Phylum)
+ncore_high<-core_high
+ncore_high$Phylum<-factor(ncore_high$Phylum,levels=c(unique(ncore_high$Phylum)))
+
 png("./Figures/AS_16splots/highabundance-otusv1.png",height=10,width=30,units="cm",res=300)
-ggplot(core_high, aes(X.OTU.ID, y=value)) + 
-  geom_boxplot(aes(fill=Phylum)) + geom_jitter(colour="gray80", alpha=0.65) + facet_grid(cols=vars(variable)) + scale_fill_manual(values = c(ActinobacteriotaCol, BacteroidotaCol, CrenarchaeotaCol, CyanobacteriaCol,NitrospirotaCol,PlanctomycetotaCol, ProteobacteriaCol, UnclassifiedCol)) + theme_bw() + theme(axis.text.x=element_text(angle=90,hjust=1))
+ggplot(ncore_high, aes(X.OTU.ID, y=value)) + 
+  geom_boxplot(aes(fill=Phylum)) + geom_jitter(colour="gray80", alpha=0.65) + facet_grid(cols=vars(variable)) + scale_fill_manual(values = c(CrenarchaeotaCol,UnclassifiedCol,PlanctomycetotaCol,CyanobacteriaCol,ActinobacteriotaCol, BacteroidotaCol, ProteobacteriaCol, NitrospirotaCol)) + theme_bw() + theme(axis.text.x=element_text(angle=90,hjust=1))
 dev.off()
 png("./Figures/AS_16splots/highabundance-otusv2.png",height=10,width=30,units="cm",res=300)
-ggplot(core_high, aes(variable, y=value)) + geom_boxplot(aes(fill=Phylum))+ geom_jitter(colour="gray80", alpha=0.65) + facet_grid(cols=vars(X.OTU.ID)) + scale_fill_manual(values = c(ActinobacteriotaCol, BacteroidotaCol, CrenarchaeotaCol, CyanobacteriaCol,NitrospirotaCol,PlanctomycetotaCol, ProteobacteriaCol, UnclassifiedCol)) + theme_bw() + theme(axis.text.x=element_text(angle=90,hjust=1))
+ggplot(ncore_high, aes(variable, y=value)) + geom_boxplot(aes(fill=Phylum))+ geom_jitter(colour="gray80", alpha=0.65) + facet_grid(cols=vars(X.OTU.ID)) + scale_fill_manual(values = c(CrenarchaeotaCol,UnclassifiedCol,PlanctomycetotaCol,CyanobacteriaCol,ActinobacteriotaCol, BacteroidotaCol, ProteobacteriaCol, NitrospirotaCol)) + theme_bw() + theme(axis.text.x=element_text(angle=90,hjust=1))
 dev.off()
 #LOw abundance- the remaining cc's
 
@@ -329,22 +345,31 @@ core_low<-mcore_otu%>%
   arrange(desc(value))%>%
   filter(value<=0.1)
 unique(core_low$Phylum)
-
+ncore_low<-core_low
+ncore_low$Phylum<-factor(ncore_low$Phylum, levels=c(unique(ncore_low$Phylum)))
 png("./Figures/AS_16splots/lowabundance-otusv1.png",height=10,width=30,units="cm",res=300)
-ggplot(core_low, aes(X.OTU.ID, y=value)) +
-  geom_boxplot(aes(fill=Phylum)) + geom_jitter(colour="gray80", alpha=0.65) + facet_grid(cols=vars(variable)) + scale_fill_manual(values = c(AcidobacteriotaCol,ActinobacteriotaCol,DadabacteriaCol,DesulfobacterotaCol, BacteroidotaCol,CrenarchaeotaCol, CyanobacteriaCol, NitrospirotaCol, PlanctomycetotaCol, ProteobacteriaCol, UnclassifiedCol,VerrucomicrobiotaCol)) + theme_bw() +
+ggplot(ncore_low, aes(X.OTU.ID, y=value)) +
+  geom_boxplot(aes(fill=Phylum)) + geom_jitter(colour="gray80", alpha=0.65) +
+  facet_grid(cols=vars(variable)) +
+  scale_fill_manual(values = c(UnclassifiedCol,BacteroidotaCol,PlanctomycetotaCol,CyanobacteriaCol,
+                               ProteobacteriaCol,DesulfobacterotaCol,ActinobacteriotaCol,CrenarchaeotaCol,
+                               NitrospirotaCol,AcidobacteriotaCol,DadabacteriaCol,VerrucomicrobiotaCol)) + theme_bw() +
   theme(axis.text.x=element_text(angle=90,hjust=1),legend.position="bottom",legend.direction="horizontal")
 dev.off()
 png("./Figures/AS_16splots/lowabundance-otusv2.png",height=10,width=30,units="cm",res=300)
-ggplot(core_low, aes(variable, y=value)) +
-  geom_boxplot(aes(fill=Phylum)) + geom_jitter(colour="gray80", alpha=0.65) + facet_grid(cols=vars(X.OTU.ID)) + scale_fill_manual(values = c(AcidobacteriotaCol,ActinobacteriotaCol,DadabacteriaCol,DesulfobacterotaCol, BacteroidotaCol,CrenarchaeotaCol, CyanobacteriaCol, NitrospirotaCol, PlanctomycetotaCol, ProteobacteriaCol, UnclassifiedCol,VerrucomicrobiotaCol)) + theme_bw() +
+ggplot(ncore_low, aes(variable, y=value)) +
+  geom_boxplot(aes(fill=Phylum)) + geom_jitter(colour="gray80", alpha=0.65) + facet_grid(cols=vars(X.OTU.ID)) +
+  scale_fill_manual(values = c(UnclassifiedCol,BacteroidotaCol,PlanctomycetotaCol,CyanobacteriaCol,
+                               ProteobacteriaCol,DesulfobacterotaCol,ActinobacteriotaCol,CrenarchaeotaCol,
+                               NitrospirotaCol,AcidobacteriotaCol,DadabacteriaCol,VerrucomicrobiotaCol)) + theme_bw() +
   theme(axis.text.x=element_text(angle=90,hjust=1),legend.position="bottom",legend.direction="horizontal")
 dev.off()
 
 #core
 unique(mcore_otu$Phylum)
 png("./Figures/AS_16splots/coreotusbargraph.png",height=10,width=20,units="cm",res=300)
-ggplot(mcore_otu, aes(X.OTU.ID, y=value)) + geom_bar(aes(fill=Phylum), stat="identity") + scale_fill_manual(values = c(AcidobacteriotaCol,ActinobacteriotaCol, BacteroidotaCol, CrenarchaeotaCol, CyanobacteriaCol,DadabacteriaCol ,DesulfobacterotaCol, NitrospirotaCol, PlanctomycetotaCol, ProteobacteriaCol, UnclassifiedCol,VerrucomicrobiotaCol)) + theme_bw() +
+ggplot(nmcore_otu, aes(x=fct_reorder(as.factor(X.OTU.ID),value,.desc=TRUE), y=value)) + geom_bar(aes(fill=Phylum), stat="identity") +
+  scale_fill_manual(values = c(CrenarchaeotaCol,UnclassifiedCol, ActinobacteriotaCol, BacteroidotaCol, CyanobacteriaCol,PlanctomycetotaCol, ProteobacteriaCol, DesulfobacterotaCol, NitrospirotaCol,AcidobacteriotaCol,DadabacteriaCol,VerrucomicrobiotaCol)) + theme_bw() +
   theme(axis.text.x=element_text(angle=90,hjust=1))
 dev.off()
 

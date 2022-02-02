@@ -79,8 +79,8 @@ summary.rad.htest<-function (x, ...)
 #Input/Output paths
 ###########################
 
-taxa<-read.csv("./Data/18s/taxa_fixed18s.csv",sep=",")
-otus<-read.csv("./Data/18s/all.otutab.csv", sep="\t")
+taxa<-read.csv("./Data/18s/taxa_fixed18s.csv",sep=";")
+otus<-read.csv("./Data/18s/all.otutab.csv", sep=";")
 otus<-arrange(otus, X.OTU.ID)
 taxa<-arrange(taxa,sequence_identifier)
 
@@ -104,11 +104,8 @@ cat<-cat[cat$countSum>=5,]
 cat<-cat%>%filter(Domain!="Bacteria")
 
 #remove otu 1 and 2 because of coamplification
-#FInd which rows to delete
-which(cat$X.OTU.ID=="OTU_1")
-which(cat$X.OTU.ID=="OTU_2")
-#Delete row 1 and 95
-cat<-cat[-c(1,85),]
+#Delete row 1 and 2
+cat<-cat[-c(1,2),]
 
 head(cat)
 #Till which column do the samples go on to?
@@ -361,12 +358,12 @@ dev.off()
 xs1otuRAD<-rad.zipfbrot(t(cat[c(2)]))
 xs2otuRAD<-rad.zipf(t(cat[c(3)]))
 xs3otuRAD<-rad.zipf(t(cat[c(4)]))
-#xs4otuRAD<-rad.zipfbrot(t(cat[c(5)])) #didn't converge
+xs4otuRAD<-rad.zipfbrot(t(cat[c(5)]))
 xs5otuRAD<-rad.zipf(t(cat[c(6)]))
 xs6otuRAD<-rad.zipf(t(cat[c(7)]))
 xs7otuRAD<-rad.zipf(t(cat[c(8)]))
 xs8otuRAD<-rad.zipf(t(cat[c(9)]))
-xs9otuRAD<-rad.zipfbrot(t(cat[c(10)]))
+#xs9otuRAD<-rad.zipfbrot(t(cat[c(10)]))#didn't converge
 #xs10otuRAD<-rad.zipfbrot(t(cat[c(11)]))#didn't converge
 xs11otuRAD<-rad.lognormal(t(cat[c(12)]))
 xs44otuRAD<-rad.zipf(t(cat[c(45)]))
@@ -381,9 +378,9 @@ xs17otuRAD<-rad.zipf(t(cat[c(18)]))
 xs18otuRAD<-rad.zipf(t(cat[c(19)]))
 xs19otuRAD<-rad.zipfbrot(t(cat[c(20)]))
 xs20otuRAD<-rad.zipfbrot(t(cat[c(21)]))
-#xs21otuRAD<-rad.zipfbrot(t(cat[c(22)])) didn't converge
+#xs21otuRAD<-rad.zipfbrot(t(cat[c(22)])) #didn't converge
 xs22otuRAD<-rad.zipf(t(cat[c(23)]))
-xs42otuRAD<-rad.zipfbrot(t(cat[c(43)]))
+xs42otuRAD<-rad.preempt(t(cat[c(43)]))
 xs43otuRAD<-rad.lognormal(t(cat[c(44)]))
 
 #For species T.citroni
@@ -403,7 +400,7 @@ xs35otuRAD<-rad.zipf(t(cat[c(36)]))
 xs36otuRAD<-rad.zipf(t(cat[c(37)]))
 xs37otuRAD<-rad.zipfbrot(t(cat[c(38)]))
 xs38otuRAD<-rad.zipf(t(cat[c(39)]))
-xs39otuRAD<-rad.preempt(t(cat[c(40)]))
+xs39otuRAD<-rad.zipf(t(cat[c(40)]))
 xs40otuRAD<-rad.zipf(t(cat[c(41)]))
 xs41otuRAD<-rad.zipf(t(cat[c(42)]))
 
@@ -411,9 +408,11 @@ xs41otuRAD<-rad.zipf(t(cat[c(42)]))
 #Plot everything together
 
 #Plot everything together
-tiff("./Figures/18splots/xoturad_grouped.tiff",width=8,height=8,units="in",res=300)
+tiff("./Figures/18splots/xoturad_grouped2.tiff",width=8,height=8,units="in",res=300)
 par(mfrow=c(3,4))#13650
 #For sp 1
+plot.new()
+
 plot(xs2otuRAD,pch=1,lty=1,col=2,ylim=c(1,13650),xlim=c(0,110))
 mtext(side=3,"Zipf",cex=1)
 points(xs3otuRAD,col=2)
@@ -431,15 +430,16 @@ lines(xs44otuRAD,col=2)
 
 plot(xs1otuRAD,pch=1,lty=1,col=7,ylim=c(1,13650),xlim=c(0,110))
 mtext(side=3,"Zipf-mandelbrot",cex=1)
-points(xs9otuRAD,col=7)
-lines(xs9otuRAD,col=7)
+points(xs4otuRAD,col=7)
+lines(xs4otuRAD,col=7)
+
 
 plot(xs11otuRAD,pch=1,lty=1,col=11,ylim=c(1,13650),xlim=c(0,110))
 mtext(side=3,"Lognormal",cex=1)
 
+#For sp 2 #phylumRADPlot
 plot.new()
 
-#For sp 2 #phylumRADPlot
 plot(xs12otuRAD,pch=1,lty=1,col=2,ylim=c(1,13650),xlim=c(0,110))
 mtext(side=3,"Zipf",cex=1)
 points(xs14otuRAD,col=2)
@@ -464,7 +464,6 @@ points(xs42otuRAD,col=7)
 lines(xs42otuRAD,col=7)
 plot(xs43otuRAD,pch=1,lty=1,col=11,ylim=c(1,13650),xlim=c(0,110))
 mtext(side=3,"Lognormal",cex=1)
-plot.new()
 #########################
 #For species 3
 plot(xs26otuRAD,col=6,ylim=c(1,13650),xlim=c(0,110))
@@ -473,8 +472,9 @@ points(xs28otuRAD,col=6)
 lines(xs28otuRAD,col=6)
 points(xs32otuRAD,col=6)
 lines(xs32otuRAD,col=6)
-points(xs39otuRAD,col=6)
-lines(xs39otuRAD,col=6)
+points(xs42otuRAD,col=6)
+lines(xs42otuRAD,col=6)
+
 
 plot(xs23otuRAD,pch=1,lty=1,col=2,ylim=c(1,13650),xlim=c(0,110))
 mtext(side=3,"Zipf",cex=1)
@@ -500,30 +500,55 @@ points(xs36otuRAD,col=2)
 lines(xs36otuRAD,col=2)
 points(xs38otuRAD,col=2)
 lines(xs38otuRAD,col=2)
+points(xs39otuRAD,col=2)
+lines(xs39otuRAD,col=2)
 points(xs40otuRAD,col=2)
 lines(xs40otuRAD,col=2)
+
+plot(xs37otuRAD,col=7,ylim=c(1,6520),xlim=c(0,110))
+mtext(side=3,"Zipf-mandelbrot",cex=1)
 
 
 plot(xs43otuRAD,col=11,ylim=c(1,6520),xlim=c(0,110))
 mtext(side=3,"Lognormal",cex=1)
 
-plot(xs37otuRAD,col=7,ylim=c(1,6520),xlim=c(0,110))
-mtext(side=3,"Zipf-mandelbrot",cex=1)
-points(xs42otuRAD,col=7)
-lines(xs42otuRAD,col=7)
+
 
 
 dev.off()
-#5 11 and 22 didn't converge so remove these
+#columns 10 11 and 22 didn't converge so remove these
 #head(cat)
 head(cat)
-xotuRAD<-radfit(t(as.data.frame(cat)[,c(2,3,4,6:10,12:21,23:45)]))
-summary(xotuRAD)
-head(xotuRAD)
+dim(cat)
+str(cat)
+xotuRAD<-radfit((t(cat[,c(2:9,12:21,23:45)])))
+xyz<-(t(cat[,c(2:9,12:21,23:45)]))
+#Any columns that now equal 0
+which(colSums(xyz)%in% 0)
+#Now because of sample removal some OTUs have 0s in all columns so need to remove these
+head(xyz)
+#remove 102,104,130,141,152,154,168,170,262
+xcat<-cat[-c(102,104,130,141,152,154,168,170,262),c(2:9,12:21,23:45)]
+xotuRAD<-radfit(as.data.frame(t(xcat)))
+str(xcat)
+xxx<-as.data.frame.numeric(xyz)
+head(xxx)
+library(dplyr)
+xxx<-xxx%>%
+  select(which(!colSums(xxx) %in% 0))
+dim(xxx)
+rownames()
+yyy<-
+try<-radfit(as.matrix(xxx))
+
 xotuRAD_test<-rad_test(xotuRAD, conf.level = 0.95, log = T )
 ??rad_test()
 summary.rad.htest(xotuRAD_test)
 print.rad.test(xotuRAD_test)
+
+xotuRAD<-radfit(t(cat[,c(2:14,16:45)]))
+xotuRAD_test<-rad_test(radfit(jj), conf.level = 0.95, log = T )
+summary.rad.htest(xotuRAD_test)
 
 png("Figures/18splots/18s_fulloturadtest.png",res=300,units="cm",width=40,height=20)
 par(mfrow=c(1,2),mai=c(1,1,1,1))

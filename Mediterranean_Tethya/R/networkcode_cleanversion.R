@@ -87,7 +87,7 @@ counts_tci<- tcimatrix_abund[ ,which((names(tcimatrix) %in% active_otustci)==TRU
 rho <- propr(counts_tci, metric = "rho","clr", alpha=NA,p=100)
 best <- rho[">", .70]
 plot(best)
-dendrogram(best)
+mat<-getMatrix(best)
 pca(best)
 rhomatrixbest<-getMatrix(best)
 best<-propr::simplify(best)
@@ -99,8 +99,8 @@ dim(rhomatrix)
 max(rhomatrix)
 min(rhomatrix)
 
-tiff("Figures/Networks/Tcitrina16s_rho.tiff",res=300,units="cm",width=30,height=25)
-corrgram(rhomatrixbest,order=TRUE,main="Rho proportionality between OTUs present in T citrina 16s samples ",
+tiff("Figures/Networks/Tcitrina16s_rho.tiff",res=300,units="cm",width=45,height=30)
+corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in T citrina 16s samples ",
          lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
 dev.off()
 ########################
@@ -156,8 +156,8 @@ CountsPath18<-"./Data/18s/all.otutab.csv"
 otuTaxonomyPath18<-"./Data/18s/taxa_fixed18s.csv"
 #Need to remove sample GW1956 because of low sampling -> the 16th sample
 #belonging to Tme
-otutable<-read.csv(CountsPath18, sep="\t")
-taxatable<-read.csv(otuTaxonomyPath18, sep=",")
+otutable<-read.csv(CountsPath18, sep=";")
+taxatable<-read.csv(otuTaxonomyPath18, sep=";")
 #reorder otu to match taxa
 #get OTU counts and add them to DF
 countSum<-apply(otutable[-1],1,sum)
@@ -167,13 +167,14 @@ countsDF<-cbind(otutable, countSum)
 countsWithTaxonomy<-bind_cols(countsDF[order(countsDF$X.OTU.ID),], taxatable[order(taxatable$sequence_identifier),])
 head(countsWithTaxonomy)
 countsWithTaxonomy<-countsWithTaxonomy%>%
-  filter(Domain!="Bacteria")
+  filter(Domain!="Bacteria")%>%
+  filter(Class!="Demospongiae")
 
 #Filter from 50 counts up
 countsWithTaxonomy<-countsWithTaxonomy[countsWithTaxonomy$countSum >=5,]
 
 #Make a separate otu table without taxa
-otu_table=select(countsWithTaxonomy,-c(46:57))
+otu_table=select(countsWithTaxonomy,-c(46:54))
 otut<-otu_table[,-1]
 #OTU Id as row name
 rownames(otut)<-otu_table[,1]
@@ -184,11 +185,11 @@ otu_table<-as.data.frame(t(otut))
 #remove bad sample which is different for this dataset
 #GW1968 belonging to T citrina
 head(otu_table)
-which(colnames(otu_table)=="OTU_1")
-which(colnames(otu_table)=="OTU_2")
+which(colnames(otu_table)=="OTU_4076")
+which(colnames(otu_table)=="OTU_4077")
 which(rownames(otu_table)=="GW1968")
 dim(otu_table)
-otu_table<-otu_table[-28,-c(1,85)]
+otu_table<-otu_table[-28,-c(1,2)]
 dim(otu_table)
 otu_table$total <- rowSums(otu_table)
 otu_table$sponge <- c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau")
@@ -262,6 +263,7 @@ head(otus)
 taxa<-arrange(taxa,sequence_identifier)
 otu_and_taxa<-bind_cols(otus,taxa)
 otu_and_taxa<-otu_and_taxa%>%filter(!(Domain=="Bacteria" & dataset=="18s"))
+otu_and_taxa<-otu_and_taxa%>%filter(!(Class=="Demospongiae" & dataset=="18s"))
 
 #and remove two otus fromcoamplified sponges for 18s
 #Take out OTU for sponge amplification
@@ -274,8 +276,8 @@ coamplif_sponge<-otus_and_taxa[otus_and_taxa$dataset=="18s",]%>%
 #
 coamplif_sponge$sequence_identifier[1]#OTU_4076
 otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4076"),]
-coamplif_sponge$sequence_identifier[2]#OTU_4206
-otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4206"),]
+coamplif_sponge$sequence_identifier[2]#OTU_4077
+otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4077"),]
 
 #filtering: should be done seperate for both 16 and 18s data set
 #Keep rows that have more than 50 counds and are from 16s data set OR have more than 5 counts and belong to 18s ddataset
@@ -290,7 +292,7 @@ otut<-data_all[,-1]
 rownames(otut)<-data_all[,1]
 #Samples as row
 otu_table<-as.data.frame(t(otut))
-
+head(otu_table)
 #calculate the total number of reads per sample
 #remove both bad samples from 16s and 18s
 #GW1968 and GW1956
@@ -330,9 +332,12 @@ rho <- propr(filteredmat_tau, metric = "rho","clr", alpha=NA,p=100)
 best <- rho[">", .60]
 plot(best)
 #
-rhomatrix<-getMatrix(rho)
-
-tiff("Figures/Networks/Taurantium16sand18s_rho.tiff",res=300,units="cm",width=20,height=20)
+rhomatrixtau<-getMatrix(rho)
+png("Figures/Networks/Taurantium16sand18s_rho.png",res=300,units="cm",width=30,height=20)
+corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in T aurantium 16s and 18s samples ",
+         lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
+dev.off()
+tiff("Figures/Networks/Taurantium16sand18s_rho.tiff",res=300,units="cm",width=30,height=20)
 corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in T aurantium 16s and 18s samples ",
          lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
 dev.off()
@@ -352,10 +357,13 @@ rho <- propr(filteredmat_tme, metric = "rho","clr", alpha=NA,p=100)
 best <- rho[">", .60]
 plot(best)
 #
-rhomatrix<-getMatrix(rho)
-
-tiff("Figures/Networks/Tmerantium16sand18s_rho.tiff",res=300,units="cm",width=20,height=20)
-corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in T meloni 16s and 18s samples ",
+rhomatrixtme<-getMatrix(rho)
+png("Figures/Networks/Tme16sand18s_rho.png",res=300,units="cm",width=20,height=20)
+corrgram(rhomatrixtme,order=TRUE,main="Rho proportionality between OTUs present in T meloni 16s and 18s samples ",
+         lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
+dev.off()
+tiff("Figures/Networks/Tme16sand18s_rho.svg",res=300,units="cm",width=20,height=20)
+corrgram(rhomatrixtme,order=TRUE,main="Rho proportionality between OTUs present in T meloni 16s and 18s samples ",
          lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
 dev.off()
 
@@ -377,14 +385,44 @@ plot(best)
 #
 rhomatrixtci<-getMatrix(rhotci)
 
-tiff("Figures/Networks/Tciaurantium16sand18s_rho.tiff",res=300,units="cm",width=20,height=20)
-corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in T citrina 16s and 18s samples ",
+tiff("Figures/Networks/Tci16sand18s_rho.tiff",res=300,units="cm",width=40,height=30)
+corrgram(rhomatrixtci,order=TRUE,main="Rho proportionality between OTUs present in T citrina 16s and 18s samples ",
+         lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
+dev.off()
+png("Figures/Networks/Tci16sand18s_rho.png",res=300,units="cm",width=50,height=40)
+corrgram(rhomatrixtci,order=TRUE,main="Rho proportionality between OTUs present in T citrina 16s and 18s samples ",
          lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
 dev.off()
 
 ## Visual Network
 library(igraph)
 library(tidygraph)
+links_tme<-as_data_frame(graph_from_adjacency_matrix(rhomatrixtme,weighted=TRUE))
+otus_tme<-names(filteredmat_tme)
+??rep()
+head(otus_tme)
+dataset_tme<-c("dataset16s","dataset16s","dataset16s","dataset16s","dataset18s","dataset18s")
+
+nodes_tci<-cbind(otus_tci,dataset_tci)
+head(links_tci)
+net<-graph.data.frame(links_tci,nodes_tci,directed=F)
+plot(net)
+net <-simplify(net, remove.multiple = F, remove.loops = T)
+head(links_tci)
+links_tci_filter1<-links_tci[links_tci$weight>0.7,]
+links_tci_filter2<-links_tci[links_tci$weight<(-0.7),]
+links_tcix<-rbind(links_tci_filter1,links_tci_filter2)
+net<-graph.data.frame(links_tcix,nodes_tci,directed=F)
+
+deg <-degree(net, mode="all")
+head(nodes_tci)
+colrs <-c("green", "yellow") 
+V(net)$color <-colrs[V(net)$dataset_tci]
+E(net)$width <-E(net)$weight
+png("./Figures/Networks/networkdiagramtci.png",units="in",width=8,height=8,res=300)
+plot(net,vertex.size=20,vertex.label.colour="black",pt.bg=colrs)
+dev.off()
+
 links_tci<-as_data_frame(graph_from_adjacency_matrix(rhomatrixtci,weighted=TRUE))
 otus_tci<-names(filteredmat_tci)
 dataset_tci<-rep("dataset16s",49)
@@ -394,8 +432,8 @@ net<-graph.data.frame(links_tci,nodes_tci,directed=F)
 plot(net)
 net <-simplify(net, remove.multiple = F, remove.loops = T)
 head(links_tci)
-links_tci_filter1<-links_tci[links_tci$weight>0.5,]
-links_tci_filter2<-links_tci[links_tci$weight<(-0.5),]
+links_tci_filter1<-links_tci[links_tci$weight>0.7,]
+links_tci_filter2<-links_tci[links_tci$weight<(-0.7),]
 links_tcix<-rbind(links_tci_filter1,links_tci_filter2)
 net<-graph.data.frame(links_tcix,nodes_tci,directed=F)
 
@@ -403,7 +441,8 @@ deg <-degree(net, mode="all")
 head(nodes_tci)
 colrs <-c("green", "yellow") 
 V(net)$color <-colrs[V(net)$dataset_tci]
-E(net)$width <-E(net)$weight/6
-png("networkdiagramtci.png",units="in",width=8,height=8,res=300)
+E(net)$width <-E(net)$weight
+png("./Figures/Networks/networkdiagramtci.png",units="in",width=8,height=8,res=300)
 plot(net,vertex.size=20,vertex.label.colour="black",pt.bg=colrs)
 dev.off()
+
