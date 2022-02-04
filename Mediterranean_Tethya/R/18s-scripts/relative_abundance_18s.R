@@ -49,26 +49,32 @@ oat[oat==""]<-"Unclassified"
 #Find last sample column
 which(colnames(oat)=="GW1984")
 head(oat)
+dim(oat)
 #Melt table to make phylum ID
-#remove all columns except OTU ID, samples and phyla
-oatmelt<-melt(oat[-c(46:50,52:56)])
+#sumarize sum per species across all samples
+oatmelt1<-oat%>%
+  rowwise() %>%
+  mutate(
+    sumtau = sum(c_across(c(2:12,45))),
+    sumtme = sum(c_across(c(13:23,43,44))),
+    sumtci = sum(c_across(24:42))
+  )
+dim(oatmelt1)
+oatmelt1<-oatmelt1[,c(46,51,57:59)]
+oatmelt<-melt(oatmelt1)
+head(oatmelt)
+#Melt data set and remove unnecassary rows
 #Make each variable (sample names) a level
-levels(oatmelt$variable)<-c("GW1941","GW1942" ,"GW1943","GW1944", "GW1945", "GW1946", "GW1947", "GW1948","GW1949","GW1950","GW1951",
-                            "GW1952", "GW1953", "GW1954", "GW1955","GW1956", "GW1957", "GW1958", "GW1959","GW1960","GW1961","GW1962",
-                            "GW1963","GW1964","GW1965","GW1966", "GW1967", "GW1968", "GW1969", "GW1970", "GW1971","GW1972","GW1973","GW1974", "GW1975","GW1976", "GW1977", "GW1978","GW1979", "GW1980", "GW1981", "GW1982", "GW1983", "GW1984")
+levels(oatmelt$variable)<-c("sumtau","sumtme","sumtci")
 #Assign species names to each sample via the levels
-levels(oatmelt$variable)<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau",
-                            "Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme",
-                            "Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci",
-                            "Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau")
-
-#Group by species and calc relative abundance of each OTU for each species
+levels(oatmelt$variable)<-c("Tau","Tme","Tci")
+##########
 zoatmelt<-oatmelt%>%
   group_by(variable)%>%
   summarise(relative_abundance=value/sum(value))
+head(zoatmelt)
 #Check relative abundances add up to 1 for each sp
 sum(zoatmelt$relative_abundance[zoatmelt$variable=="Tci"])
-head(zoatmelt)
 #Bind the "relative_abundance" col (for each sp seperately) to the main data set
 dataset<-cbind(oatmelt,zoatmelt[2])
 unique(oat$Phylum)
@@ -77,17 +83,25 @@ unique(oat$Phylum)
 #DAta with just the core OTUs and also with just non core OTUs
 ##core
 head(core_community)
-coredata<-oat[oat$X.OTU.ID %in% core_community$`otus[, 1]`,]
+coredata<-oat[oat$X.OTU.ID %in% core_community$X.OTU.ID,]
 dim(coredata)
-coredatamelt<-melt(coredata[-c(1,46:50,52:56)])
+head(coredata)
+######
+coredatamelt1<-coredata%>%
+  rowwise() %>%
+  mutate(
+    sumtau = sum(c_across(c(2:12,45))),
+    sumtme = sum(c_across(c(13:23,43,44))),
+    sumtci = sum(c_across(24:42))
+  )
+coredatamelt1<-coredatamelt1[,c(46,51,57:59)]
+coredatamelt<-melt(coredatamelt1)
+head(oatmelt)
+#Make each variable (sample names) a level
+levels(coredatamelt$variable)<-c("sumtau","sumtme","sumtci")
+#Assign species names to each sample via the levels
+levels(coredatamelt$variable)<-c("Tau","Tme","Tci")
 
-levels(coredatamelt$variable)<-c("GW1941","GW1942" ,"GW1943","GW1944", "GW1945", "GW1946", "GW1947", "GW1948","GW1949","GW1950","GW1951",
-                                 "GW1952","GW1953", "GW1954", "GW1955", "GW1956", "GW1957", "GW1958", "GW1959","GW1960","GW1961","GW1962",
-                                 "GW1963","GW1964","GW1965", "GW1966", "GW1967", "GW1968", "GW1969","GW1970","GW1971","GW1972", "GW1973","GW1974", "GW1975", "GW1976", "GW1977", "GW1978", "GW1979","GW1980","GW1981", "GW1982","GW1983", "GW1984")
-
-levels(coredatamelt$variable)<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau",
-                                 "Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme",
-                                 "Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau")
 ##for core dataset
 #Group by species and calc relative abundance of each OTU for each species
 xcoredatamelt<-coredatamelt%>%
@@ -111,7 +125,7 @@ Magnoliophyta<-"darkgreen"
 Mollusca<-"tomato3"                 
 Bryoza<-"tomato1"   
 Echinodermata<-"purple"   
-Kinorhyncha<-"thistle4"                    
+Kinorhyncha<-"springgreen2"                    
 Chlorophyta<-"tan4"               
 Arthropoda<-"tan3"
 Dinoflagellata<-"steelblue4"
@@ -125,7 +139,8 @@ ggplot(dataset, aes(variable, y=value,fill=Phylum)) + geom_bar(position="fill",s
                                Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                Rhodophyta,Unclassified))+
   labs(x="Species",y="Relative abundance")+ theme(legend.title=element_blank())+
-scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citroni)))+theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
+scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citroni)))+
+  theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
 ggsave("relative_abundances_18s.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
 
 #REpeat but without unclassified and porifera OTUS 
@@ -146,12 +161,28 @@ ggplot(bdataset, aes(variable, y=relative_abundance)) + geom_col(aes(fill=Phylum
                                Rhodophyta))+
   labs(x="Species",y="Relative abundance")+scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citroni)))+theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
 ggsave("2relative_abundances_18s_wo_unclassandporifera.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
+###
+#REpeat but without unclassified OTUS only
+boatmelt<-oatmelt[oatmelt$Phylum!="Unclassified",]
+dim(boatmelt)
 
+#Repeat grouping and abundance calc
+#Group by species and calc relative abundance of each OTU for each species
+bboatmelt<-boatmelt%>%
+  group_by(variable)%>%
+  summarise(relative_abundance=value/sum(value))
+#Bind the "relative_abundance" col (for each sp seperately) to the main data set
+bdataset<-cbind(boatmelt,bboatmelt[2])
+#
+ggplot(bdataset, aes(variable, y=relative_abundance)) + geom_col(aes(fill=Phylum),position="fill") +
+  scale_fill_manual(values = c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,Chordata,
+                               Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
+                               Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
+                               Rhodophyta))+
+  labs(x="Species",y="Relative abundance")+scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citroni)))+theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
+ggsave("2relative_abundances_18s_wo_unclass.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
+###################333
 
-unique(oat$Domain)
-head(oat)
-dim(oat)
-oatmelt<-melt(oat[-c(46:50,53:56)])
 otucount<-oatmelt%>%
   group_by(Phylum)%>%
   summarise(Numb_otu=n())
@@ -161,7 +192,7 @@ ggplot(otucount, aes(x=Numb_otu,y=Phylum))+geom_col(fill=c(Annelida,Arthropoda,B
                                                                                   Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                                                                   Rhodophyta,Unclassified))+labs(x="Number of OTUs",y="Phylum")+theme_bw()
 ggsave("Freq_of_otu.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
-#WIhtout unclassified
+#Withtout unclassified
 
 botu_count<-otucount[(otucount$Phylum!="Unclassified"),]
 svg(filename="Figures/18splots/Freq_of_otu_wo_unclass.svg",width=30,height=10)
@@ -172,39 +203,42 @@ ggplot(botu_count, aes(y=Numb_otu,x=Phylum))+geom_col(fill=c(Annelida,Arthropoda
                                                            Rhodophyta))+labs(x="Phylum",y="Number of OTUs")+theme_bw()
 
 dev.off()
-str(oatmelt)
-#Make each variable (sample names) a level
-levels(oatmelt$variable)<-c("GW1941","GW1942" ,"GW1943","GW1944", "GW1945", "GW1946", "GW1947", "GW1948","GW1949","GW1950","GW1951",
-                            "GW1952", "GW1953", "GW1954", "GW1955","GW1956", "GW1957", "GW1958", "GW1959","GW1960","GW1961","GW1962",
-                            "GW1963","GW1964","GW1965","GW1966", "GW1967", "GW1968", "GW1969", "GW1970", "GW1971","GW1972","GW1973","GW1974", "GW1975","GW1976", "GW1977", "GW1978","GW1979", "GW1980", "GW1981", "GW1982", "GW1983", "GW1984")
-#Assign species names to each sample via the levels
-levels(oatmelt$variable)<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau",
-                            "Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme",
-                            "Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau")
-
+head(oatmelt)
 ####Group by phylum and also species
-botucount<-oatmelt%>%
+botucount<-dataset%>%
+  filter(value>0)%>%
   group_by(Phylum,variable)%>%
-  summarise(Numb_otu=n())%>%
-  spread(variable,Numb_otu)%>%
-  ungroup()
+  dplyr::summarize(Numb_otu=n())
+dim(otucount)
+relabunds<-dataset%>%
+  filter(value>0)%>%
+  group_by(Phylum,variable)%>%
+  dplyr::summarise(abundance=sum(relative_abundance))
 
-#  summarise(tau_Numb_otu=n[variable=="Tau"],tme_Numb_otu=n[variable=="Tme"],Tci_Numb_otu=n[variable=="Tci"])
+dim(relabunds)
+bubbledata<-cbind(botucount,relabunds[3])
+head(bubbledata)
+
+#SHowing between phylums
+bubbledata[bubbledata==0]<-NA
+#####
 
 botu_count<-botucount[(botucount$Phylum!="Unclassified"),]
-
 #BUbble plot for comparing, richness and abundance of phylums across species
 unique(bdataset$Phylum)
+head(oat)
+View(dataset)
 otucount2<-oatmelt%>%
+  filter(value>0)%>%
   group_by(Phylum,variable)%>%
-  summarise(Numb_otu=n())
+  dplyr::summarise(Numb_otu=n())
 dim(otucount2)
 relabunds<-dataset%>%
+  filter(value>0)%>%
   group_by(Phylum,variable)%>%
   summarise(abundance=sum(relative_abundance))
 dim(relabunds)
 bubbledata<-cbind(otucount2,relabunds[3])
-head(bubbledata)
 #SHowing between phylums
 bubbledata[bubbledata==0]<-NA
 ggplot(bubbledata,aes(x=Phylum,y=Numb_otu,colour=variable,size=abundance))+geom_point()
@@ -215,10 +249,26 @@ ggplot(bubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
                                          Kinorhyncha,Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                                          Rhodophyta,Unclassified))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
   scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+
-  theme(axis.text.x = element_text(face = "italic"))+  guides(color = guide_legend(override.aes = list(size = 3) ) )
+  theme(axis.text.x = element_text(face = "italic"),legend.margin = margin(0,0,0,-2))+
+  guides(color = guide_legend(override.aes = list(size = 5),ncol=2 ),size=guide_legend(nrow=1) )
 
 ggsave("phylum_richness_and_abundance_bubble.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
 ##################
+#Without unclassified
+dim(bubbledata)
+xbubbledata<-bubbledata[(!bubbledata$Phylum=="Unclassified"),]
+dim(xbubbledata)
+ggplot(xbubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
+  scale_color_manual(values=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,
+                              Chordata,Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,
+                              Kinorhyncha,Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
+                              Rhodophyta))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
+  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+
+  theme(axis.text.x = element_text(face = "italic"),legend.margin = margin(0,0,0,-2))+
+  guides(color = guide_legend(override.aes = list(size = 5),ncol=2 ),size=guide_legend(nrow=1) )
+
+ggsave("phylum_richness_and_abundance_bubble_wo_unclass.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
+
 ############################
 ###For core Otus
 #Only core OTUs
@@ -245,11 +295,23 @@ unique(corebubbledata$Phylum)
 png("./Figures/18splots/18bubble_phylum_richness_and_abundanceCORE.png",height=20,width=30,units="cm",res=300)
 ggplot(corebubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
   scale_color_manual(values=c(Chlorophyta,Chordata,Cnidaria,Porifera,Unclassified))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
-  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ theme(axis.text.x = element_text(face = "italic"))+
-  guides(color = guide_legend(override.aes = list(size = 3) ) )
+  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+
+  theme(axis.text.x = element_text(face = "italic"),legend.margin = margin(0,0,0,-2))+
+  guides(color = guide_legend(override.aes = list(size = 5),ncol=1 ),size=guide_legend(nrow=1) )
 
 dev.off()
+############3
+#Without unclassified
+xcorebubbledata<-corebubbledata[(!corebubbledata$Phylum=="Unclassified"),]
+png("./Figures/18splots/18bubble_phylum_richness_and_abundanceCORE_wounclass.png",height=20,width=30,units="cm",res=300)
+ggplot(xcorebubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
+  scale_color_manual(values=c(Chlorophyta,Chordata,Cnidaria,Porifera))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
+  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+
+  theme(axis.text.x = element_text(face = "italic"),legend.margin = margin(0,0,0,-2))+
+  guides(color = guide_legend(override.aes = list(size = 5),ncol=1 ),size=guide_legend(nrow=1) )
 
+dev.off()
+###############33
 library(cowplot)
 library(gridExtra)
 legend18<-get_legend(ggplot(bubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
@@ -257,10 +319,10 @@ legend18<-get_legend(ggplot(bubbledata,aes(x=variable,y=Numb_otu,color=Phylum,si
                               Chordata,Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,
                               Kinorhyncha,Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
                               Rhodophyta,Unclassified))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
-  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+
-    scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ theme(axis.text.x = element_text(face = "italic"))+  guides(color = guide_legend(override.aes = list(size = 3) ) )
+  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+
+  theme(axis.text.x = element_text(face = "italic"),legend.margin = margin(0,0,0,-2))+
+  guides(color = guide_legend(override.aes = list(size = 5),ncol=2),size=guide_legend(nrow=1) ))
 
-  ggtitle("Including all OTUs"))
 fullbubble18<-ggplot(bubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
   scale_color_manual(values=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,
                               Chordata,Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,
@@ -273,31 +335,60 @@ corebubble18<-ggplot(corebubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=
   scale_color_manual(values=c(Chlorophyta,Chordata,Cnidaria,Porifera,Unclassified))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
   scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ theme(axis.text.x = element_text(face = "italic"),legend.position = "none")+
   ggtitle("Including only Core OTUs")+
-  guides(color = guide_legend(override.aes = list(size = 3) ) )
+  guides(color = guide_legend(override.aes = list(size = 5) ) )
 
-png("Figures/18splots/bubbleplots18s.png",width=11,height=7,units="in",res=300)
-grid.arrange(fullbubble18,corebubble18,legend18,nrow=1)
+png("Figures/18splots/bubbleplots18s.png",width=14,height=7,units="in",res=300)
+plot_grid(fullbubble18,corebubble18,legend18,nrow=1,rel_widths=c(7/20,7/20,6/20))
 dev.off()
 
-#WIthout unclassified, porifera and ciliophora
+#WIthout unclassified & porifera 
 bubble2<-bubbledata[(bubbledata$Phylum!="Unclassified"&bubbledata$Phylum!="Porifera"),]
-bubble2<-bubble2[(bubble2$Phylum!="Ciliophora"),]
+#bubble2<-bubble2[(bubble2$Phylum!="Ciliophora"),]
 library(tidyverse)
 ggplot(bubble2,aes(x=variable,y=Numb_otu,colour=Phylum,size=abundance))+
   scale_color_manual(values=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,
-                              Chordata, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,
+                              Chordata, Ciliophora,Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,
                               Kinorhyncha,Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,
                               Rhodophyta))+
   labs(x="Species",y="Phylum Richness",size="Relative abundance")+
   scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+
   scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ 
-  theme(axis.text.x = element_text(face = "italic"))+
-  guides(color = guide_legend(override.aes = list(size = 3) ) )
+  theme(axis.text.x = element_text(face = "italic"),legend.margin=margin(0,0,0,-2))+
+  guides(color = guide_legend(override.aes = list(size = 5),ncol=2),size=guide_legend(nrow=1) )
 
+ggsave("Figures/18splots/phylum_rich_and_abund_bubble_withoutunclass-porifera.png",dpi=300,units="cm",width=30,height=20)
+
+#WIthout unclassified graphs together
+###Grid arrangement w/o unclass
+legend18<-get_legend(ggplot(xbubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
+                       scale_color_manual(values=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,
+                                                   Chordata,Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,
+                                                   Kinorhyncha,Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
+                                                   Rhodophyta))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
+                       scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+
+                       theme(axis.text.x = element_text(face = "italic"),legend.margin = margin(0,0,0,-5))+
+                       guides(color = guide_legend(override.aes = list(size = 5),ncol=1),size=guide_legend(nrow=1) ))
+
+fullbubble18<-ggplot(xbubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
+  scale_color_manual(values=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,
+                              Chordata,Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,
+                              Kinorhyncha,Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
+                              Rhodophyta))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
+  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ theme(axis.text.x = element_text(face = "italic"),legend.position = ("none"))+
+  ggtitle("Including all OTUs")
+
+corebubble18<-ggplot(xcorebubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
+  scale_color_manual(values=c(Chlorophyta,Chordata,Cnidaria,Porifera))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
+  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ theme(axis.text.x = element_text(face = "italic"),legend.position = "none")+
+  ggtitle("Including only Core OTUs")+
+  guides(color = guide_legend(override.aes = list(size = 5) ) )
+
+png("Figures/18splots/bubbleplots18s_wo_unclass.png",width=14,height=7,units="in",res=300)
+plot_grid(fullbubble18,corebubble18,legend18,nrow=1,rel_widths=c(2/5,2/5,1/5))
+dev.off()
 
 #geom_text(aes(label=ifelse(as.numeric(variable)>20,as.character(Phylum),'')),vjust=0.3,hjust=0.3,position = position_stack(vjust = 0.3))
   
-ggsave("Figures/18splots/phylum_rich_and_abund_bubble_withoutunclass-cill-porifera.png",dpi=300,units="cm",width=30,height=20)
 #TO LOOK AT RICHNESS AS THE SIZE Instead and ABUNDANCE on y axis
 #ggplot(bubble2,aes(x=variable,y=abundance,color=Phylum,size=Numb_otu))+
 #  scale_color_manual(values=c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,
