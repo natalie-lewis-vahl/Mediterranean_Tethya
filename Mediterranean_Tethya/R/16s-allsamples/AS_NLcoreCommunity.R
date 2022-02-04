@@ -238,18 +238,39 @@ dataset<-cbind(ydatamelt,xdatamelt[2])
 #DAta with just the core OTUs and also with just non core OTUs
 ##core
 coredata<-xdata[xdata$X.OTU.ID %in% core_community$X.OTU.ID,]
-head(coredata)
-ycoredata<-coredata%>%
+coredatamelt1<-coredata%>%
   rowwise() %>%
   mutate(
-    sumtau = sum(c_across(c(2:12,45))),
-    sumtme = sum(c_across(c(13:23,43,44))),
-    sumtci = sum(c_across(24:42))
+    tau = sum(c_across(c(2:12,45))),
+    tme = sum(c_across(c(13:23,43,44))),
+    tci = sum(c_across(24:42))
   )
-coredatamelt<-melt(ycoredata[,c(46,48,54:56)])
+coredatamelt2<-melt(coredatamelt1[,c(1,46,48,54:56)])
+dim(coredatamelt2)                   
+OTUpresence<-as.data.frame(coredata[,2:45]>0)#turns into logical value, true or false if present or not
+OTUpresence<-cbind(coredata[,1],OTUpresence)
+cclimits<-OTUpresence%>%
+  rowwise() %>%
+  mutate(
+    sumtau = sum(c_across(c(2:12,45))/12),
+    sumtme = sum(c_across(c(13:23,43,44))/13),
+    sumtci = sum(c_across(24:42)/19))
+cclimits2<-cclimits[,c(1,46:48)]
+cclimitmelt<-melt(cclimits2)
+dim(cclimitmelt)
+names(cclimitmelt)[names(cclimitmelt) == 'value'] <- 'limit'
+names(cclimitmelt)[names(cclimitmelt) == 'variable'] <- 'sample'
+
+coredatacomb<-cbind(coredatamelt2,cclimitmelt)
+coredatamelt<-coredatacomb%>%
+  filter(limit>=0.9)
+View(coredatamelt)
+coredatamelt<-coredatamelt[,-c(2,6:8)]
+head(coredatamelt)
+dim(coredatamelt)
+###################
 
 #Set levels
-levels(coredatamelt$variable)<-c("sumtau","sumtme","sumtci")
 levels(coredatamelt$variable)<-c("Tau","Tme","Tci")
 
 ##for core dataset
@@ -261,7 +282,7 @@ xcoredatamelt<-coredatamelt%>%
 coredataset<-cbind(coredatamelt,xcoredatamelt[2])
 
 ##non-core
-noncoredata<-xdata[!(xdata$X.OTU.ID %in% core_community$X.OTU.ID),]#HEREEE
+noncoredata<-xdata[!(xdata$X.OTU.ID %in% coredataset$X.OTU.ID),]#HEREEE
 ynoncoredata<-noncoredata%>%
   rowwise() %>%
   mutate(
@@ -269,10 +290,27 @@ ynoncoredata<-noncoredata%>%
     sumtme = sum(c_across(c(13:23,43,44))),
     sumtci = sum(c_across(24:42))
   )
-noncoredatamelt<-melt(ynoncoredata[,c(46,48,54:56)])
+                  
+OTUpresence<-as.data.frame(noncoredata[,2:45]>0)#turns into logical value, true or false if present or not
+OTUpresence<-cbind(noncoredata[,1],OTUpresence)
+cclimits<-OTUpresence%>%
+  rowwise() %>%
+  mutate(
+    sumtau = sum(c_across(c(2:12,45))/12),
+    sumtme = sum(c_across(c(13:23,43,44))/13),
+    sumtci = sum(c_across(24:42)/19))
+cclimits2<-cclimits[,c(1,46:48)]
+cclimitmelt<-melt(cclimits2)
+dim(cclimitmelt)
+names(cclimitmelt)[names(cclimitmelt) == 'value'] <- 'limit'
+names(cclimitmelt)[names(cclimitmelt) == 'variable'] <- 'sample'
+
+noncoredatacomb<-cbind(ynoncoredata,cclimitmelt)
+noncoredatamelt<-noncoredatacomb%>%
+  filter(limit>=0.9)
+noncoredatamelt<-noncoredatamelt[,-c(2,6:8)]
 
 #Set levels
-levels(noncoredatamelt$variable)<-c("sumtau","sumtme","sumtci")
 levels(noncoredatamelt$variable)<-c("Tau","Tme","Tci")
 
 ##REpeat for noncore dataset
@@ -352,6 +390,36 @@ ggplot(coredataset, aes(variable, y=relative_abundance)) + geom_bar(aes(fill=Phy
   labs(x="Species",y="Relative abundance")+
   scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citrina)))+
   theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
+dev.off()
+#####
+##Grid panel for stacked bars
+legend<-get_legend(ggplot(dataset, aes(variable, y=relative_abundance,fill=Phylum)) + geom_bar(aes(fill=Phylum),stat="identity", position="fill") + 
+  scale_fill_manual(values = c(AcidobacteriotaCol, ActinobacteriotaCol, BacteroidotaCol,CalditrichotaCol,ChloroflexiCol, CrenarchaeotaCol,
+                               CyanobacteriaCol, DadabacteriaCol,DeferrisomatotaCol, DeinococcotaCol, DesulfobacterotaCol, EntotheonellaeotaCol,
+                               GemmatimonadotaCol,LatescibacterotaCol, MyxococcotaCol, NB1jCol ,NitrospinotaCol, NitrospirotaCol,PlanctomycetotaCol,
+                               ProteobacteriaCol, SAR324cladeCol, SpirochaetotaCol, UnclassifiedCol,VerrucomicrobiotaCol)) +
+  labs(x="Species",y="Relative abundance")+
+  scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citrina)))+
+  theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))+
+  guides(fill=guide_legend(ncol=1)))
+
+plot1<-ggplot(dataset, aes(variable, y=relative_abundance,fill=Phylum)) + geom_bar(aes(fill=Phylum),stat="identity", position="fill") + 
+  scale_fill_manual(values = c(AcidobacteriotaCol, ActinobacteriotaCol, BacteroidotaCol,CalditrichotaCol,ChloroflexiCol, CrenarchaeotaCol,
+                               CyanobacteriaCol, DadabacteriaCol,DeferrisomatotaCol, DeinococcotaCol, DesulfobacterotaCol, EntotheonellaeotaCol,
+                               GemmatimonadotaCol,LatescibacterotaCol, MyxococcotaCol, NB1jCol ,NitrospinotaCol, NitrospirotaCol,PlanctomycetotaCol,
+                               ProteobacteriaCol, SAR324cladeCol, SpirochaetotaCol, UnclassifiedCol,VerrucomicrobiotaCol)) +
+  labs(x="Species",y="Relative abundance")+ggtitle("Including all OTUs")+
+  scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citrina)))+
+  theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9),legend.position="none")
+
+plot2<-ggplot(coredataset, aes(variable, y=relative_abundance)) + geom_bar(aes(fill=Phylum), stat="identity", position="fill") + 
+  scale_fill_manual(values = c(AcidobacteriotaCol, ActinobacteriotaCol, BacteroidotaCol,CrenarchaeotaCol, CyanobacteriaCol, DadabacteriaCol, DesulfobacterotaCol,NitrospirotaCol,PlanctomycetotaCol, ProteobacteriaCol,UnclassifiedCol, VerrucomicrobiotaCol)) +
+  labs(x="Species",y="Relative abundance")+ggtitle("Including only core OTUs")+
+  scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citrina)))+
+  theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9),legend.position="none")
+
+png("Figures/AS_16splots/stackedbar16s.png",width=14,height=7,units="in",res=300)
+plot_grid(plot1,plot2,legend,nrow=1,rel_widths=c(2/5,2/5,1/5))
 dev.off()
 #non core phyla
 unique(noncoredataset$Phylum)

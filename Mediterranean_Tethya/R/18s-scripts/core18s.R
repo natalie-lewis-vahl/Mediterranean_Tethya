@@ -66,9 +66,9 @@ OTUpresence<-OTUpresence %>%
   rowwise() %>%
   mutate(
     sumall =sum(c_across(2:45))/44,
-    sumtau = sum(c_across(c(2:12,45)))/11,
-    sumtme = sum(c_across(c(13:23,44,43)))/11,
-    sumtci = sum(c_across(24:42))/22
+    sumtau = sum(c_across(c(2:12,45)))/12,
+    sumtme = sum(c_across(c(13:23,44,43)))/13,
+    sumtci = sum(c_across(24:42))/19
   )
 ######
 #####Inspect number of OTUs per sp and spread of richness
@@ -137,7 +137,7 @@ venn.diagram(
 #Core communities
 core_community<-OTUpresence%>%
   dplyr::filter(sumtau>=0.90 |sumtme>=0.90 | sumtci>=0.90)
-nrow(core_community)#24
+nrow(core_community)#13
 #OR
 cc_all<-OTUpresence%>%
   filter(sumall>= 0.90)%>%
@@ -145,12 +145,12 @@ cc_all<-OTUpresence%>%
 nrow(cc_all)
 cc_tau<-OTUpresence%>%
   filter(sumtau>=0.90)%>%
-  mutate("which_sp"="T. au")#17
+  mutate("which_sp"="T. au")#11
 nrow(cc_tau)
 cc_tme<-OTUpresence%>%
   filter(sumtme>= 0.90)%>%
   mutate("which_sp"="T. me")
-nrow(cc_tme)#9
+nrow(cc_tme)#3
 cc_tci<-OTUpresence%>%
   filter(sumtci>= 0.90)%>%
   mutate("which_sp"="T. ci")
@@ -162,7 +162,7 @@ library(VennDiagram)
 
 myCol <- brewer.pal(3, "Pastel2")
 venn.diagram(
-  x = list(cc_tau$`otus[, 1]`, cc_tme$`otus[, 1]`, cc_tci$`otus[, 1]`),
+  x = list(cc_tau$X.OTU.ID, cc_tme$X.OTU.ID, cc_tci$X.OTU.ID),
   category.names = c("T. aurantium" , "T. meloni " , "T. citrina"),
   filename = 'Figures/18splots/core18s_vendiagram.png',
   output=TRUE,

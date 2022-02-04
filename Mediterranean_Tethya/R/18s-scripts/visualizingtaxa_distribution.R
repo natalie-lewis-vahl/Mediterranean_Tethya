@@ -78,11 +78,12 @@ Brachiopoda<-"steelblue2"
 Chordata<-"yellowgreen"
 ####
 head(datax)
-tiff("./Figures/18splots/overall18s_taxa_distribution2.tiff",units="in", width=18, height=7, res=300)
+datax[datax$phylum==""]<-"Unclassified"
+png("./Figures/18splots/overall18s_taxa_distributionunclass.png",units="in", width=18, height=7, res=300)
 ggplot(datax,aes(x=Phylum,y=n,fill=Phylum))+
-  geom_bar(stat="identity")+scale_y_continuous(limits=c(0,25),expand=c(0,0),minor_breaks = seq(0 , 25, 1), breaks = seq(0, 100, 5))+
+  geom_bar(stat="identity")+scale_y_continuous(limits=c(0,250),expand=c(0,0),minor_breaks = seq(0 , 250, 10), breaks = seq(0, 250, 50))+
   scale_x_discrete(expand=c(0,0))+
-  scale_fill_manual(values = c(Ciliophora,Porifera,Bacillariophyta,Annelida,Cnidaria,Arthropoda,
+  scale_fill_manual(values = c(Unclassified,Ciliophora,Porifera,Bacillariophyta,Annelida,Cnidaria,Arthropoda,
                                Dinoflagellata,Rhodophyta,Chlorophyta,Chordata,Mollusca,Brachiopoda,Bryoza,
                                Echinodermata,Euglenoza,Kinorhyncha,Magnoliophyta,Nematoda,Platyhelminthes)) +
   labs(x="Phylum",y="Number of OTUs")+ggtitle("All 3 tethya species combined")+

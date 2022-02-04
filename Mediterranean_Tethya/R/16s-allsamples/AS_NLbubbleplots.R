@@ -16,6 +16,9 @@ relabunds<-dataset%>%
 relabunds<-relabunds%>%
   group_by(Phylum,variable)%>%
   dplyr::summarise(abundance=sum(relative_abundance))
+head(dataset)
+
+sum(dataset$relative_abundance[dataset$variable=="Tau"])
 
 dim(relabunds)
 bubbledata<-cbind(otucount,relabunds[3])
@@ -23,8 +26,7 @@ head(bubbledata)
 #SHowing between phylums
 bubbledata[bubbledata==0]<-NA
 #Showing between species
-nbubbledata<-bubbledata
-head(nbubbledata)
+head(bubbledata)
 png("./Figures/AS_16splots/bubble_phylum_richness_and_abundance.png",height=20,width=30,units="cm",res=300)
 ggplot(bubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
   scale_color_manual(values=c(AcidobacteriotaCol,ActinobacteriotaCol,BacteroidotaCol,
@@ -182,3 +184,4 @@ ggplot(bubbledata,aes(x=variable,y=abundance/Numb_otu,color=Phylum))+
   guides(color = guide_legend(override.aes = list(size = 5),ncol=2),size=guide_legend(nrow=1) )
 
 dev.off()
+

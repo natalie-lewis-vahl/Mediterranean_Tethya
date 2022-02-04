@@ -34,6 +34,7 @@ plot1data<-filtered%>%
 data<-plot1data$n
 names(data)<-plot1data$Phylum
 barplot(data)
+View(data)
 #The large amount of otus belonging to unclassified makes other phyla harder
 #to differentiate - could represent same phyla or lots of different ones
 #remove 9215 unknown OTUs optional

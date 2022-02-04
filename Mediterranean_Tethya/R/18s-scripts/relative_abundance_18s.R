@@ -81,27 +81,50 @@ unique(oat$Phylum)
 
 ####Core dataset
 #DAta with just the core OTUs and also with just non core OTUs
-##core
+##core_community: load from core 18s script
 head(core_community)
 coredata<-oat[oat$X.OTU.ID %in% core_community$X.OTU.ID,]
-dim(coredata)
 head(coredata)
 ######
 coredatamelt1<-coredata%>%
   rowwise() %>%
   mutate(
-    sumtau = sum(c_across(c(2:12,45))),
-    sumtme = sum(c_across(c(13:23,43,44))),
-    sumtci = sum(c_across(24:42))
+    tau = sum(c_across(c(2:12,45))),
+    tme = sum(c_across(c(13:23,43,44))),
+    tci = sum(c_across(24:42))
   )
-coredatamelt1<-coredatamelt1[,c(46,51,57:59)]
-coredatamelt<-melt(coredatamelt1)
-head(oatmelt)
-#Make each variable (sample names) a level
-levels(coredatamelt$variable)<-c("sumtau","sumtme","sumtci")
-#Assign species names to each sample via the levels
-levels(coredatamelt$variable)<-c("Tau","Tme","Tci")
+coredatamelt2<-melt(coredatamelt1[,c(1,46,51,57:59)])
+dim(coredatamelt2)                   
+OTUpresence<-as.data.frame(coredata[,2:45]>0)#turns into logical value, true or false if present or not
 
+OTUpresence<-cbind(coredata[,1],OTUpresence)
+cclimits<-OTUpresence%>%
+  rowwise() %>%
+  mutate(
+    sumtau = sum(c_across(c(2:12,45))/12),
+    sumtme = sum(c_across(c(13:23,43,44))/13),
+    sumtci = sum(c_across(24:42)/19))
+cclimits2<-cclimits[,c(1,46:48)]
+cclimitmelt<-melt(cclimits2)
+dim(cclimitmelt)
+names(cclimitmelt)[names(cclimitmelt) == 'value'] <- 'limit'
+names(cclimitmelt)[names(cclimitmelt) == 'variable'] <- 'sample'
+names(cclimitmelt)[names(cclimitmelt) == 'X.OTU.ID'] <- 'otu'
+
+coredatacomb<-cbind(coredatamelt2,cclimitmelt)
+coredatamelt<-coredatacomb%>%
+  filter(limit>=0.9)
+
+coredatamelt<-coredatamelt[,-c(6:8)]
+head(coredatamelt)
+dim(coredatamelt)
+
+#Make each variable (sample names) a level
+levels(coredatamelt$variable)<-c("tau","tme","tci")
+
+######
+
+######
 ##for core dataset
 #Group by species and calc relative abundance of each OTU for each species
 xcoredatamelt<-coredatamelt%>%
@@ -181,8 +204,58 @@ ggplot(bdataset, aes(variable, y=relative_abundance)) + geom_col(aes(fill=Phylum
                                Rhodophyta))+
   labs(x="Species",y="Relative abundance")+scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citroni)))+theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
 ggsave("2relative_abundances_18s_wo_unclass.png",path=plotsPath,dpi=300,units="cm",width=30,height=20)
-###################333
+###################
+#coreOTUs
+png("./Figures/18splots/relativeabundance-corephyla.png",height=10,width=20,units="cm",res=300)
+ggplot(coredataset, aes(variable, y=relative_abundance)) + geom_bar(aes(fill=Phylum), stat="identity", position="fill") + 
+  scale_fill_manual(values = c(Chlorophyta,Chordata,Cnidaria,Porifera,Unclassified)) +
+  labs(x="Species",y="Relative abundance")+
+  scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citrina)))+
+  theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
+dev.off()
 
+##Without unclassified
+bcoredatamelt<-coredatamelt[coredatamelt$Phylum!="Unclassified",]
+#Repeat grouping and abundance calc
+#Group by species and calc relative abundance of each OTU for each species
+coredatamelt2<-bcoredatamelt%>%
+  group_by(variable)%>%
+  summarise(relative_abundance=value/sum(value))
+#Bind the "relative_abundance" col (for each sp seperately) to the main data set
+bcoredataset<-cbind(bcoredatamelt,coredatamelt2[2])
+bcoredataset
+png("./Figures/18splots/relativeabundance-corephyla_wounclass.png",height=10,width=20,units="cm",res=300)
+ggplot(bcoredataset, aes(variable, y=relative_abundance)) + geom_bar(aes(fill=Phylum), stat="identity", position="fill") + 
+  scale_fill_manual(values = c(Chlorophyta,Chordata,Cnidaria,Porifera)) +
+  labs(x="Species",y="Relative abundance")+
+  scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citrina)))+
+  theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9))
+dev.off()
+####################
+###gridlayout for stacked bar w/o unclass
+legend<-get_legend(ggplot(bdataset, aes(variable, y=relative_abundance)) + geom_col(aes(fill=Phylum),position="fill") +
+  scale_fill_manual(values = c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,Chordata,
+                               Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
+                               Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
+                               Rhodophyta))+
+  labs(x="Species",y="Relative abundance")+scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citroni)))+theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9)))
+plot1<-ggplot(bdataset, aes(variable, y=relative_abundance)) + geom_col(aes(fill=Phylum),position="fill") +
+  scale_fill_manual(values = c(Annelida,Arthropoda,Bacillariophyta,Brachiopoda,Bryoza,Chlorophyta,Chordata,
+                               Ciliophora, Cnidaria,Dinoflagellata,Echinodermata,Euglenoza,Kinorhyncha,
+                               Magnoliophyta,Mollusca,Nematoda,Platyhelminthes,Porifera,
+                               Rhodophyta))+labs(x="Species",y="Relative abundance")+ggtitle("Including all OTUs")+
+  scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citroni)))+
+  theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9),legend.position="none")
+plot2<-ggplot(bcoredataset, aes(variable, y=relative_abundance)) + geom_bar(aes(fill=Phylum), stat="identity", position="fill") + 
+  scale_fill_manual(values = c(Chlorophyta,Chordata,Cnidaria,Porifera)) +
+  labs(x="Species",y="Relative abundance")+ggtitle("Including only core OTUs")+
+  scale_x_discrete(labels = expression(italic(T.aurantium),italic(T.meloni),italic(T.citrina)))+
+  theme_bw() + theme(axis.text.x=element_text(angle=0,hjust=0.5,size=9),legend.position="none")
+
+png("Figures/18splots/stackedbar18s.png",width=14,height=7,units="in",res=300)
+plot_grid(plot1,plot2,legend,nrow=1,rel_widths=c(2/5,2/5,1/5))
+dev.off()
+#####
 otucount<-oatmelt%>%
   group_by(Phylum)%>%
   summarise(Numb_otu=n())
