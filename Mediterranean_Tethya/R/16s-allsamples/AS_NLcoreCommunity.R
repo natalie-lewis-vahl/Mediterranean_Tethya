@@ -63,7 +63,6 @@ OTUPresence[OTUPresence==""]<-"Unclasssified"
 countsperphyla<-OTUPresence%>%
   group_by(Phylum)%>%
   tally()
-View(countsperphyla)
 ######
 #####Inspect number of OTUs per sp and spread of richness
 OTUntau<-OTUPresence%>%
@@ -133,7 +132,7 @@ core_community<-OTUPresence%>%
   dplyr::filter(sumtau>=0.90 |sumtme>=0.90 | sumtci>=0.90) #52 in total
 list(core_community$sequence_identifier)
 nrow(core_community)
-
+View(core_community)
 #or
 cc_all<-OTUPresence%>%
   filter(sumall>= 0.90)%>%
@@ -238,6 +237,8 @@ dataset<-cbind(ydatamelt,xdatamelt[2])
 #DAta with just the core OTUs and also with just non core OTUs
 ##core
 coredata<-xdata[xdata$X.OTU.ID %in% core_community$X.OTU.ID,]
+#Prev line selects all core OTUs for all species so need to calculate
+#percentage of samples present again to filter later
 coredatamelt1<-coredata%>%
   rowwise() %>%
   mutate(
@@ -264,7 +265,6 @@ names(cclimitmelt)[names(cclimitmelt) == 'variable'] <- 'sample'
 coredatacomb<-cbind(coredatamelt2,cclimitmelt)
 coredatamelt<-coredatacomb%>%
   filter(limit>=0.9)
-View(coredatamelt)
 coredatamelt<-coredatamelt[,-c(2,6:8)]
 head(coredatamelt)
 dim(coredatamelt)
@@ -290,7 +290,8 @@ ynoncoredata<-noncoredata%>%
     sumtme = sum(c_across(c(13:23,43,44))),
     sumtci = sum(c_across(24:42))
   )
-                  
+
+noncoredatamelt2<-melt(ynoncoredata[,c(1,48,54:56)])
 OTUpresence<-as.data.frame(noncoredata[,2:45]>0)#turns into logical value, true or false if present or not
 OTUpresence<-cbind(noncoredata[,1],OTUpresence)
 cclimits<-OTUpresence%>%
@@ -305,12 +306,13 @@ dim(cclimitmelt)
 names(cclimitmelt)[names(cclimitmelt) == 'value'] <- 'limit'
 names(cclimitmelt)[names(cclimitmelt) == 'variable'] <- 'sample'
 
-noncoredatacomb<-cbind(ynoncoredata,cclimitmelt)
+noncoredatacomb<-cbind(noncoredatamelt2,cclimitmelt)
 noncoredatamelt<-noncoredatacomb%>%
-  filter(limit>=0.9)
-noncoredatamelt<-noncoredatamelt[,-c(2,6:8)]
+  filter(!limit>=0.9)
+noncoredatamelt<-noncoredatamelt[,-c(5:7)]
 
 #Set levels
+head(noncoredatamelt)
 levels(noncoredatamelt$variable)<-c("Tau","Tme","Tci")
 
 ##REpeat for noncore dataset

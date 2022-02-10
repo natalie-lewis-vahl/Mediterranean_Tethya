@@ -59,7 +59,7 @@ plot.rad.test<-function (x, which = "original", las = 1, ...)
     if (x$log == TRUE) 
       boxplot(log(deviance) ~ bpm, data = x$original, 
               las = las, ...)
-    else boxplot(deviance ~ bpm, data = x$original, las = las, 
+    else boxplot(deviance ~ bpm, data = x$original, las = las, ylim=c(3,12), 
                  ...)
   }
   if (which == "post.hoc") {
@@ -141,7 +141,7 @@ s12tmephylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,12]))
 s13tmephylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,13]))
 s14tmephylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,14]))
 s15tmephylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,15]))
-s16tmephylumRAD<-rad.zipf(t(as.data.frame(abundanceByPhylumBySample)[,16]))
+#s16tmephylumRAD<-rad.zipf(t(as.data.frame(abundanceByPhylumBySample)[,16]))
 s17tmephylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,17]))
 s18tmephylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,18]))
 s19tmephylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,19]))
@@ -224,10 +224,8 @@ lines(s17tmephylumRAD,col=6)
 points(s18tmephylumRAD,col=6)
 lines(s18tmephylumRAD,col=6)
 
-plot(s16tmephylumRAD,pch=1,lty=1,col=2,ylim=c(1,25000),xlim=c(0,30))
+plot(s20tmephylumRAD,pch=1,lty=1,col=2,ylim=c(1,25000),xlim=c(0,30))
 mtext(side=3,"Zipf",cex=1)
-points(s20tmephylumRAD,col=2)
-lines(s20tmephylumRAD,col=2)
 points(s21tmephylumRAD,col=2)
 lines(s21tmephylumRAD,col=2)
 points(s22tmephylumRAD,col=2)
@@ -349,7 +347,7 @@ xs12otuRAD<-rad.zipfbrot(t(cat[c(13)]))
 xs13otuRAD<-rad.zipfbrot(t(cat[c(14)]))
 xs14otuRAD<-rad.zipfbrot(t(cat[c(15)]))#COULD NOT CONVERGE
 xs15otuRAD<-rad.lognormal(t(cat[c(16)]))
-xs16otuRAD<-rad.zipf(t(cat[c(17)]))
+#xs16otuRAD<-rad.zipf(t(cat[c(17)]))#bad sample GW1956
 xs17otuRAD<-rad.preempt(t(cat[c(18)]))
 xs18otuRAD<-rad.lognormal(t(cat[c(19)]))
 xs19otuRAD<-rad.zipfbrot(t(cat[c(20)]))
@@ -414,14 +412,12 @@ mtext(side=3,"Zipf-mandelbrot",cex=1)
 plot(xs11otuRAD,pch=1,lty=1,col=11,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Lognormal",cex=1)
 
-#For sp 2 #phylumRADPlot
+#For sp 2 #otuRADPlot
 plot(xs17otuRAD,col=6,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Preemption",cex=1)
 
-plot(xs16otuRAD,pch=1,lty=1,col=2,ylim=c(1,16100),xlim=c(0,310))
+plot(xs20otuRAD,pch=1,lty=1,col=2,ylim=c(1,16100),xlim=c(0,310))
 mtext(side=3,"Zipf",cex=1)
-points(xs20otuRAD,col=2)
-lines(xs20otuRAD,col=2)
 points(xs21otuRAD,col=2)
 lines(xs21otuRAD,col=2)
 points(xs22otuRAD,col=2)
@@ -491,13 +487,54 @@ plot.new()
 dev.off()
 
 #head(cat)
-xotuRAD<-radfit(t(cat[,c(2:14,16:45)]))
+xotuRAD<-radfit(t(cat[c(2:14,16,18:45)]))
 xotuRAD_test<-rad_test(xotuRAD, conf.level = 0.95, log = T )
 summary.rad.htest(xotuRAD_test)
 
-png("Figures/AS_16splots/allOTU16radtest.png",height=20,width=30,units="cm",res=300)
+png("Figures/AS_16splots/allOTU16radtest.png",height=20,width=35,units="cm",res=300)
 par(mfrow=c(1,2),mai=c(1,1,1,1))
 plot.rad.test(xotuRAD_test)
 plot.rad.test(xotuRAD_test, "post.hoc")
+dev.off()
+#Per species
+#T. aurantium
+tauotuRAD<-radfit(t(cat[c(2:12,45)]))
+tauotuRAD_test<-rad_test(tauotuRAD, conf.level = 0.95, log = T )
+summary.rad.htest(tauotuRAD_test)
+
+png("Figures/AS_16splots/tauOTU16radtest.png",height=20,width=35,units="cm",res=300)
+par(mfrow=c(1,2),mai=c(1,1,1,1))
+plot.rad.test(tauotuRAD_test)
+plot.rad.test(tauotuRAD_test, "post.hoc")
+dev.off()
+####
+#T. meloni
+tmeotuRAD<-radfit(t(cat[c(13,14,16,18:23,43,44)]))
+tmeotuRAD_test<-rad_test(tmeotuRAD, conf.level = 0.95, log = T )
+summary.rad.htest(tmeotuRAD_test)
+
+png("Figures/AS_16splots/tmeOTU16radtest.png",height=20,width=35,units="cm",res=300)
+par(mfrow=c(1,2),mai=c(1,1,1,1))
+plot.rad.test(tmeotuRAD_test)
+plot.rad.test(tmeotuRAD_test, "post.hoc")
+dev.off()
+####
+#T. citrina
+tciotuRAD<-radfit(t(cat[c(24:42)]))
+tciotuRAD_test<-rad_test(tciotuRAD, conf.level = 0.95, log = T )
+summary.rad.htest(tciotuRAD_test)
+
+png("Figures/AS_16splots/tciOTU16radtest.png",height=20,width=35,units="cm",res=300)
+par(mfrow=c(1,2),mai=c(1,1,1,1))
+plot.rad.test(tciotuRAD_test)
+plot.rad.test(tciotuRAD_test, "post.hoc")
+dev.off()
+
+#all 3 together
+png("Figures/AS_16splots/allsp_otu16radtest.png",height=20,width=60,units="cm",res=300)
+par(mfrow=c(1,3),mai=c(0.5,0.5,0.5,0.5))
+plot.rad.test(tauotuRAD_test)
+plot.rad.test(tmeotuRAD_test)
+plot.rad.test(tciotuRAD_test)
 dev.off()
 

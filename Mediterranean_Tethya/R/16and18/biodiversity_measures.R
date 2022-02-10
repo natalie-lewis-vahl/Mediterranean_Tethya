@@ -33,7 +33,10 @@ otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4077"),]
 otus_and_taxab<-otus_and_taxa[otus_and_taxa$countSum >= 50 & otus_and_taxa$dataset=="16s"|otus_and_taxa$countSum >= 5 & otus_and_taxa$dataset=="18s",]
 head(otus_and_taxab)
 data_all<-otus_and_taxab
-head(data_all)
+library(writexl)
+
+write_xlsx(data_all,"Figures/data_full_filtered.xlsx")
+
 #For absence or presence data
 data_all<-as.data.frame(data_all[,-c(1:2,47:55)]>0)
 data_all<-cbind(data_all,otus_and_taxab[1])
@@ -100,21 +103,21 @@ shanplot16<-ggplot(alpha,aes(species,shannon,colour=spcols))+
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
-  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 richplot16<-ggplot(alpha,aes(species,richness,colour=spcols))+
   geom_point()+
   ylab("Species richness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
-  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 pielouplot16<-ggplot(alpha,aes(species,pielou,colour=spcols))+
   geom_point()+
   ylab("Pielou's evenness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
-  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 png("Figures/AS_16splots/alphadivplots16s.png",units="cm",width=30,height=10,res=300)
 plot_grid(shanplot16,richplot16,pielouplot16,ncol=3)
 dev.off()
@@ -137,21 +140,21 @@ shanplot18<-ggplot(alpha18,aes(species,shannon,colour=spcols))+
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
-  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 richplot18<-ggplot(alpha18,aes(species,richness,colour=spcols))+
   geom_point()+
   ylab("Species richness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
-  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 pielouplot18<-ggplot(alpha18,aes(species,pielou,colour=spcols))+
   geom_point()+
   ylab("Pielou's evenness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
-  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 png("Figures/18splots/alphadivplots18s.png",units="cm",width=30,height=10,res=300)
 plot_grid(shanplot18,richplot18,pielouplot18,ncol=3)
 dev.off()
@@ -174,21 +177,21 @@ shanplotb<-ggplot(alphab,aes(species,shannon,colour=spcols))+
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
-  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 richplotb<-ggplot(alphab,aes(species,richness,colour=spcols))+
   geom_point()+
   ylab("Species richness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
-  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 pielouplotb<-ggplot(alphab,aes(species,pielou,colour=spcols))+
   geom_point()+
   ylab("Pielou's evenness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
-  scale_x_discrete(labels=c("Tau"="T.aurantium","Tci"="T.citrina","Tme"="T.meloni"))
+  scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 png("Figures/16and18splots/alphadivplots16and18s.png",units="cm",width=30,height=10,res=300)
 plot_grid(shanplotb,richplotb,pielouplotb,ncol=3)
 dev.off()

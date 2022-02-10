@@ -99,7 +99,7 @@ library(VennDiagram)
 head(otun_tau)
 myCol <- brewer.pal(3, "Pastel2")
 venn.diagram(
-  x = list(otun_tau$`otus[, 1]`, otun_tme$`otus[, 1]`, otun_tci$`otus[, 1]`),
+  x = list(otun_tau$X.OTU.ID, otun_tme$X.OTU.ID, otun_tci$X.OTU.ID),
   category.names = c("T. aurantium" , "T. meloni " , "T. citrina"),
   filename = 'Figures/18splots/spreadofrichness_venn_diagramm.png',
   output=TRUE,
@@ -155,7 +155,7 @@ cc_tci<-OTUpresence%>%
   filter(sumtci>= 0.90)%>%
   mutate("which_sp"="T. ci")
 nrow(cc_tci)#0
-head(cc_tau)
+View(cc_tau)
 #####
 #Ven Diagram
 library(VennDiagram)

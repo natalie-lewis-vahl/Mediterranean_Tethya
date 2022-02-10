@@ -161,13 +161,13 @@ s42tmephylumRAD<-rad.lognormal(t(as.data.frame(abundanceByPhylumBySample)[,42]))
 s43tmephylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,43]))
 
 ###########
-#For species T.citroni
+#For species T.citrina
 s23tciphylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,23]))
 s24tciphylumRAD<-rad.zipf(t(as.data.frame(abundanceByPhylumBySample)[,24]))
 s25tciphylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,25]))
 s26tciphylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,26]))
 s27tciphylumRAD<-rad.zipfbrot(t(as.data.frame(abundanceByPhylumBySample)[,27]))
-s28tciphylumRAD<-rad.lognormal(t(as.data.frame(abundanceByPhylumBySample)[,28]))
+#s28tciphylumRAD<-rad.lognormal(t(as.data.frame(abundanceByPhylumBySample)[,28]))#bad sample
 s29tciphylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,29]))
 s30tciphylumRAD<-rad.preempt(t(as.data.frame(abundanceByPhylumBySample)[,30]))
 s31tciphylumRAD<-rad.lognormal(t(as.data.frame(abundanceByPhylumBySample)[,31]))
@@ -281,10 +281,8 @@ points(s38tciphylumRAD,col=7)
 lines(s38tciphylumRAD,col=7)
 
 
-plot(s28tciphylumRAD,col=11,ylim=c(1,6520),xlim=c(0,12))
+plot(s31tciphylumRAD,col=11,ylim=c(1,6520),xlim=c(0,12))
 mtext(side=3,"Lognormal",cex=1)
-points(s31tciphylumRAD,col=11)
-lines(s31tciphylumRAD,col=11)
 points(s32tciphylumRAD,col=11)
 lines(s32tciphylumRAD,col=11)
 points(s33tciphylumRAD,col=11)
@@ -324,13 +322,7 @@ dev.off()
 s2otuRAD<-rad.zipf(t(cat[(cat$Phylum != ""),c(3)]))
 s3otuRADRAD<-rad.zipfbrot(t(cat[(cat$Phylum != ""),c(4)]))
 #etc
-head(otuRAD)
-otuRAD_test<-rad_test(otuRAD, conf.level = 0.95, log = T)
-summary.rad.htest(otuRAD_test)
-print.rad.test(otuRAD_test)
-par(mfrow=c(1,2),mai=c(1,1,1,1))
-plot.rad.test(otuRAD_test)
-plot.rad.test(otuRAD_test, "post.hoc")
+
 #######
 
 # AND
@@ -383,13 +375,13 @@ xs22otuRAD<-rad.zipf(t(cat[c(23)]))
 xs42otuRAD<-rad.preempt(t(cat[c(43)]))
 xs43otuRAD<-rad.lognormal(t(cat[c(44)]))
 
-#For species T.citroni
+#For species T.citrina
 xs23otuRAD<-rad.zipf(t(cat[c(24)]))
 xs24otuRAD<-rad.zipf(t(cat[c(25)]))
 xs25otuRAD<-rad.zipf(t(cat[c(26)]))
 xs26otuRAD<-rad.preempt(t(cat[c(27)]))
 xs27otuRAD<-rad.zipf(t(cat[c(28)]))
-xs28otuRAD<-rad.preempt(t(cat[c(29)]))
+xs28otuRAD<-rad.preempt(t(cat[c(29)]))#the bad sample GW1968
 xs29otuRAD<-rad.zipf(t(cat[c(30)]))
 xs30otuRAD<-rad.zipf(t(cat[c(31)]))
 xs31otuRAD<-rad.zipf(t(cat[c(32)]))
@@ -454,6 +446,7 @@ points(xs18otuRAD,col=2)
 lines(xs18otuRAD,col=2)
 points(xs22otuRAD,col=2)
 lines(xs22otuRAD,col=2)
+
 plot(xs13otuRAD,pch=1,lty=1,col=7,ylim=c(1,13650),xlim=c(0,110))
 mtext(side=3,"Zipf-mandelbrot",cex=1)
 points(xs19otuRAD,col=7)
@@ -468,12 +461,8 @@ mtext(side=3,"Lognormal",cex=1)
 #For species 3
 plot(xs26otuRAD,col=6,ylim=c(1,13650),xlim=c(0,110))
 mtext(side=3,"Preemption",cex=1)
-points(xs28otuRAD,col=6)
-lines(xs28otuRAD,col=6)
 points(xs32otuRAD,col=6)
 lines(xs32otuRAD,col=6)
-points(xs42otuRAD,col=6)
-lines(xs42otuRAD,col=6)
 
 
 plot(xs23otuRAD,pch=1,lty=1,col=2,ylim=c(1,13650),xlim=c(0,110))
@@ -517,43 +506,60 @@ mtext(side=3,"Lognormal",cex=1)
 
 dev.off()
 #columns 10 11 and 22 didn't converge so remove these
+#and remove bad sample column 29
 #head(cat)
-head(cat)
-dim(cat)
-str(cat)
-xotuRAD<-radfit((t(cat[,c(2:9,12:21,23:45)])))
-xyz<-(t(cat[,c(2:9,12:21,23:45)]))
-#Any columns that now equal 0
-which(colSums(xyz)%in% 0)
-#Now because of sample removal some OTUs have 0s in all columns so need to remove these
-head(xyz)
-#remove 102,104,130,141,152,154,168,170,262
-xcat<-cat[-c(102,104,130,141,152,154,168,170,262),c(2:9,12:21,23:45)]
-xotuRAD<-radfit(as.data.frame(t(xcat)))
-str(xcat)
-xxx<-as.data.frame.numeric(xyz)
-head(xxx)
-library(dplyr)
-xxx<-xxx%>%
-  select(which(!colSums(xxx) %in% 0))
-dim(xxx)
-rownames()
-yyy<-
-try<-radfit(as.matrix(xxx))
 
+############
+xotuRAD<-radfit(t(cat[c(2:9,12:21,23:28,30:45)]))
 xotuRAD_test<-rad_test(xotuRAD, conf.level = 0.95, log = T )
-??rad_test()
-summary.rad.htest(xotuRAD_test)
-print.rad.test(xotuRAD_test)
-
-xotuRAD<-radfit(t(cat[,c(2:14,16:45)]))
-xotuRAD_test<-rad_test(radfit(jj), conf.level = 0.95, log = T )
 summary.rad.htest(xotuRAD_test)
 
-png("Figures/18splots/18s_fulloturadtest.png",res=300,units="cm",width=40,height=20)
+png("Figures/18splots/allOTU18radtest.png",height=20,width=35,units="cm",res=300)
 par(mfrow=c(1,2),mai=c(1,1,1,1))
 plot.rad.test(xotuRAD_test)
 plot.rad.test(xotuRAD_test, "post.hoc")
 dev.off()
+#####
+##
+#Per species
+#T. aurantium
+tauotuRAD<-radfit(t(cat[c(2:9,12,45)]))
+tauotuRAD_test<-rad_test(tauotuRAD, conf.level = 0.95, log = T )
+summary.rad.htest(tauotuRAD_test)
 
+png("Figures/18splots/tauOTU18radtest.png",height=20,width=35,units="cm",res=300)
+par(mfrow=c(1,2),mai=c(1,1,1,1))
+plot.rad.test(tauotuRAD_test)
+plot.rad.test(tauotuRAD_test, "post.hoc")
+dev.off()
+####
+#T. meloni
+tmeotuRAD<-radfit(t(cat[c(13:21,23,43,44)]))
+tmeotuRAD_test<-rad_test(tmeotuRAD, conf.level = 0.95, log = T )
+summary.rad.htest(tmeotuRAD_test)
+
+png("Figures/18splots/tmeOTU18radtest.png",height=20,width=35,units="cm",res=300)
+par(mfrow=c(1,2),mai=c(1,1,1,1))
+plot.rad.test(tmeotuRAD_test)
+plot.rad.test(tmeotuRAD_test, "post.hoc")
+dev.off()
+####
+#T. citrina
+tciotuRAD<-radfit(t(cat[c(24:28,30:42)]))
+tciotuRAD_test<-rad_test(tciotuRAD, conf.level = 0.95, log = T )
+summary.rad.htest(tciotuRAD_test)
+
+png("Figures/18splots/tciOTU18radtest.png",height=20,width=35,units="cm",res=300)
+par(mfrow=c(1,2),mai=c(1,1,1,1))
+plot.rad.test(tciotuRAD_test)
+plot.rad.test(tciotuRAD_test, "post.hoc")
+dev.off()
+
+#all 3 together
+png("Figures/18splots/allsp_otu18radtest.png",height=20,width=60,units="cm",res=300)
+par(mfrow=c(1,3),mai=c(0.5,0.5,0.5,0.5))
+plot.rad.test(tauotuRAD_test)
+plot.rad.test(tmeotuRAD_test)
+plot.rad.test(tciotuRAD_test)
+dev.off()
 

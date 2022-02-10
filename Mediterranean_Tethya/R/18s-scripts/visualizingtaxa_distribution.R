@@ -125,7 +125,7 @@ ggplot(datatau,aes(x=Phylum,y=n,fill=Phylum))+
   geom_bar(stat="identity")+
   scale_fill_manual(values = c(Ciliophora,Bacillariophyta,Porifera,Annelida,Cnidaria,Arthropoda,
                                Rhodophyta,Chlorophyta,Dinoflagellata,Chordata,Mollusca,Brachiopoda,Bryoza,
-                               Echinodermata,Euglenoza,Kinorhyncha,Magnoliophyta,Nematoda,Platyhelminthes)) +
+                               Echinodermata,Euglenoza,Kinorhyncha,Nematoda,Platyhelminthes)) +
   labs(x="Phylum",y="Number of OTUs")+
   ggtitle(expression(italic("Tethya aurantium")))+scale_y_continuous(limits = c(0,25),expand=c(0,0),minor_breaks = seq(0 , 25, 1), breaks = seq(0, 100, 5))+
   theme_bw() + theme(axis.text.x=element_text(angle=90,hjust=0.8,size=6),legend.position="none")+

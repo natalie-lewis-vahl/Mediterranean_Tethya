@@ -140,6 +140,11 @@ bact_matrix_zscores<-((xbact_matrix-bact_matrix_rMeans)/bact_matrix_rSds)
 png("./Figures/AS_16splots/heatmap_variability_16s_allotus.png",height=8,width=8,units="in",res=300)
 heatmap(as.matrix(bact_matrix_zscores),ColSideColors =c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"))
 dev.off()
+#Display large plot with all OTUs visible-to be able to zoom
+png("./Figures/AS_16splots/heatmap_variability_16s_allotusfull.png",height=30,width=30,units="in",res=300)
+heatmap(as.matrix(bact_matrix_zscores),cexRow=0.5,ColSideColors =c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green"))
+dev.off()
+??heatmap
 #Heat map with 25 most variable OTUs
 variability<-rowVars(xbact_matrix)
 OTUVars<-cbind(bact_matrix,variability)

@@ -63,12 +63,13 @@ best <- rho[">", .50]
 
 getAdj(rho)
 rhomatrixall<-getMatrix(rho)
-
+head(rhomatrixall)
 tiff("Figures/Networks/allspecies16s_rho.tiff",res=300,units="cm",width=20,height=15)
 corrgram(rhomatrixall,order=TRUE,main="Rho proportionality between OTUs present across all 16s samples ",
          lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
 dev.off()
  
+??corrgram
 
 ########################
 ###
@@ -227,10 +228,10 @@ best <- rho[">", .60]
 plot(best)
 #
 rhomatrix<-getMatrix(rho)
-
+head(rhomatrix)
 tiff("Figures/Networks/Taurantium18s_rho.tiff",res=300,units="cm",width=20,height=15)
 corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in T aurantium 18s samples ",
-         lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
+         lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txtp.mat = rhomatrix$p, insig = 'p-value')
 dev.off()
 #####
 ##Tethya meloni
@@ -274,10 +275,11 @@ otus_and_taxa<-cbind(otu_and_taxa,countSum)
 coamplif_sponge<-otus_and_taxa[otus_and_taxa$dataset=="18s",]%>%
   arrange(desc(countSum))
 #
-coamplif_sponge$sequence_identifier[1]#OTU_4076
-otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4076"),]
-coamplif_sponge$sequence_identifier[2]#OTU_4077
-otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4077"),]
+#already removed comaplified sponge
+#coamplif_sponge$sequence_identifier[1]#OTU_4076
+#otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4076"),]
+#coamplif_sponge$sequence_identifier[2]#OTU_4077
+#otus_and_taxa<-otus_and_taxa[!(otus_and_taxa$X.OTU.ID=="OTU_4077"),]
 
 #filtering: should be done seperate for both 16 and 18s data set
 #Keep rows that have more than 50 counds and are from 16s data set OR have more than 5 counts and belong to 18s ddataset
@@ -334,11 +336,11 @@ plot(best)
 #
 rhomatrixtau<-getMatrix(rho)
 png("Figures/Networks/Taurantium16sand18s_rho.png",res=300,units="cm",width=30,height=20)
-corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in T aurantium 16s and 18s samples ",
+corrgram(rhomatrixtau,order=TRUE,main="Rho proportionality between OTUs present in T aurantium 16s and 18s samples ",
          lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
 dev.off()
 tiff("Figures/Networks/Taurantium16sand18s_rho.tiff",res=300,units="cm",width=30,height=20)
-corrgram(rhomatrix,order=TRUE,main="Rho proportionality between OTUs present in T aurantium 16s and 18s samples ",
+corrgram(rhomatrixtau,order=TRUE,main="Rho proportionality between OTUs present in T aurantium 16s and 18s samples ",
          lower.panel=panel.shade, upper.panel=panel.cor, text.panel=panel.txt)
 dev.off()
 #####
@@ -377,7 +379,7 @@ otu_samplestci <- colSums(tcimatrix)
 active_otustci <- names(otu_samplestci[otu_samplestci > 16])
 filteredmat_tci<- tcimatrix_abund[ ,which((names(tcimatrix) %in% active_otustci)==TRUE)]
 head(filteredmat_tci) 
-
+dim(filteredmat_tci)
 ##
 rhotci <- propr(filteredmat_tci, metric = "rho","clr", alpha=NA,p=100)
 best <- rho[">", .60]
@@ -397,52 +399,131 @@ dev.off()
 ## Visual Network
 library(igraph)
 library(tidygraph)
-links_tme<-as_data_frame(graph_from_adjacency_matrix(rhomatrixtme,weighted=TRUE))
-otus_tme<-names(filteredmat_tme)
-??rep()
-head(otus_tme)
-dataset_tme<-c("dataset16s","dataset16s","dataset16s","dataset16s","dataset18s","dataset18s")
-
-nodes_tci<-cbind(otus_tci,dataset_tci)
-head(links_tci)
-net<-graph.data.frame(links_tci,nodes_tci,directed=F)
-plot(net)
-net <-simplify(net, remove.multiple = F, remove.loops = T)
-head(links_tci)
-links_tci_filter1<-links_tci[links_tci$weight>0.7,]
-links_tci_filter2<-links_tci[links_tci$weight<(-0.7),]
-links_tcix<-rbind(links_tci_filter1,links_tci_filter2)
-net<-graph.data.frame(links_tcix,nodes_tci,directed=F)
-
-deg <-degree(net, mode="all")
-head(nodes_tci)
-colrs <-c("green", "yellow") 
-V(net)$color <-colrs[V(net)$dataset_tci]
-E(net)$width <-E(net)$weight
-png("./Figures/Networks/networkdiagramtci.png",units="in",width=8,height=8,res=300)
-plot(net,vertex.size=20,vertex.label.colour="black",pt.bg=colrs)
-dev.off()
-
 links_tci<-as_data_frame(graph_from_adjacency_matrix(rhomatrixtci,weighted=TRUE))
 otus_tci<-names(filteredmat_tci)
-dataset_tci<-rep("dataset16s",49)
-nodes_tci<-cbind(otus_tci,dataset_tci)
-head(links_tci)
+str(otus_tci)
+nodes_tci<-names(otus_tci)
 net<-graph.data.frame(links_tci,nodes_tci,directed=F)
 plot(net)
-net <-simplify(net, remove.multiple = F, remove.loops = T)
+net <-simplify(net, remove.multiple = T, remove.loops = T,)
+delete.vertices(simplify(net), degree(simplify(net))==0)
 head(links_tci)
-links_tci_filter1<-links_tci[links_tci$weight>0.7,]
-links_tci_filter2<-links_tci[links_tci$weight<(-0.7),]
+links_tci_filter1<-links_tci[links_tci$weight>=0.7,]
+links_tci_filter2<-links_tci[links_tci$weight<=(-0.7),]
 links_tcix<-rbind(links_tci_filter1,links_tci_filter2)
-net<-graph.data.frame(links_tcix,nodes_tci,directed=F)
-
-deg <-degree(net, mode="all")
-head(nodes_tci)
-colrs <-c("green", "yellow") 
-V(net)$color <-colrs[V(net)$dataset_tci]
+dim(links_tcix)
+nodes_tcix<-unique(links_tcix$from)
+str(nodes_tcix)#13 names
+links_tcix2$weight<-abs(links_tcix$weight)
+#links_tcix2<-cbind(links_tcix2,interactiontype)
+net<-graph_from_data_frame(links_tcix2,nodes_tcix,directed=F)
+net
+net <-simplify(net, remove.multiple = T, remove.loops = T,)
+#deg <-degree(net, mode="all")
+head(net)
+#head(nodes_tci)
+colrs <-c(rep("blue",6), rep("red",7)) 
 E(net)$width <-E(net)$weight
-png("./Figures/Networks/networkdiagramtci.png",units="in",width=8,height=8,res=300)
-plot(net,vertex.size=20,vertex.label.colour="black",pt.bg=colrs)
+l<-layout_nicely(net)
+plot(net)
+E(net)
+View(links_tcix3)
+links_tcix3<-links_tcix[c(1,11,12,2,4,5,8,22,23,24,13,16),]
+links_tcilabel<-links_tcix3%>%
+  mutate_if(is.numeric, round, 2)
+colrs <-c("blue","red","red","blue","blue","blue","blue","red","red","red","red","red") 
+png("./Figures/Networks/networkdiagramtci2.png",units="in",width=6,height=6,res=300)
+plot(net,vertex.size=25,edge.color=colrs,vertex.label.color="black",vertex.label.cex=0.3,vertex.color="lightgray",
+     layout=l,edge.label=links_tcilabel$weight,edge.label.cex=0.4,edge.label.color=colrs,vertex.label.family="Arial",
+     edge.lty=3,edge.width=0.5,edge.label.font=2,edge.label.family="Arial",vertex.label.font=2)#pt.bg=colrs ,edge.width=E(net)$weight
+dev.off()
+??vertex.label.family
+###for tme
+####
+links_tme<-as_data_frame(graph_from_adjacency_matrix(rhomatrixtme,weighted=TRUE))
+otus_tme<-names(filteredmat_tme)
+str(otus_tme)
+#dataset_tme<-c("dataset16s","dataset16s","dataset16s","dataset16s","dataset18s","dataset18s")
+#nodes_tci<-cbind(otus_tci,dataset_tci)
+nodes_tme<-names(otus_tme)
+net<-graph.data.frame(links_tme,nodes_tme,directed=F)
+plot(net)
+net <-simplify(net, remove.multiple = T, remove.loops = T,)
+delete.vertices(simplify(net), degree(simplify(net))==0)
+head(links_tme)
+links_tme_filter1<-links_tme[links_tme$weight>=0.7,]
+links_tme_filter2<-links_tme[links_tme$weight<=(-0.7),]
+links_tmex<-rbind(links_tme_filter1,links_tme_filter2)
+dim(links_tmex)
+nodes_tmex<-unique(links_tmex$from)
+str(nodes_tmex)#13 names
+links_tmex2<-links_tmex
+links_tmex2$weight<-abs(links_tmex$weight)
+#links_tcix2<-cbind(links_tcix2,interactiontype)
+net<-graph_from_data_frame(links_tmex2,nodes_tmex,directed=F)
+net <-simplify(net, remove.multiple = T, remove.loops = T,)
+#deg <-degree(net, mode="all")
+#head(nodes_tci)
+colrs <-c(rep("blue",2)) 
+E(net)$width <-E(net)$weight
+l<-layout_nicely(net)
+plot(net)
+
+#set decimal points to 2
+E(net)
+view(links_tmex)
+links_tmex3<-links_tmex[c(1,2),]
+links_tmelabel<-links_tmex3%>%
+  mutate_if(is.numeric, round, 2)
+png("./Figures/Networks/networkdiagramtme2.png",units="in",width=6,height=6,res=300)
+plot(net,layout=l,vertex.size=25,edge.color=colrs,vertex.label.color="black",vertex.label.cex=0.4,vertex.color="lightgray",
+     edge.label=links_tmelabel$weight,edge.label.cex=0.5,edge.label.color=colrs,vertex.dist=0.3,vertex.label.family="Arial",
+     edge.lty=3,edge.width=0.7,edge.label.font=2,edge.label.family="Arial",vertex.label.font=2)#pt.bg=colrs ,edge.width=E(net)$weight
+dev.off()
+
+
+#####
+##Tau
+links_tau<-as_data_frame(graph_from_adjacency_matrix(rhomatrixtau,weighted=TRUE))
+otus_tau<-names(filteredmat_tau)
+str(otus_tau)
+#dataset_tme<-c("dataset16s","dataset16s","dataset16s","dataset16s","dataset18s","dataset18s")
+#nodes_tau<-cbind(otus_tau,dataset_tau)
+nodes_tau<-names(otus_tau)
+net<-graph.data.frame(links_tau,nodes_tau,directed=F)
+plot(net)
+net <-simplify(net, remove.multiple = T, remove.loops = T,)
+delete.vertices(simplify(net), degree(simplify(net))==0)
+head(links_tau)
+links_tau_filter1<-links_tau[links_tau$weight>=0.7,]
+links_tau_filter2<-links_tau[links_tau$weight<=(-0.7),]
+links_taux<-rbind(links_tau_filter1,links_tau_filter2)
+dim(links_taux)
+nodes_taux<-unique(links_taux$from)
+str(nodes_taux)#13 names
+links_taux2<-links_taux
+links_taux2$weight<-abs(links_taux2$weight)
+#links_taux2<-cbind(links_taux2,interactiontype)
+net<-graph_from_data_frame(links_taux2,nodes_taux,directed=F)
+net <-simplify(net, remove.multiple = T, remove.loops = T,)
+#deg <-degree(net, mode="all")
+#head(nodes_tau)
+colrs <-c(rep("blue",9), rep("red",4)) 
+E(net)$width <-E(net)$weight
+l<-layout_nicely(net)
+plot(net)
+
+View(links_taux2)
+#remove edges taken out bc of loop
+links_taux3<-links_taux[c(1,22,21,2,3,4,24,23,7,8,10,14,16),]
+links_tauxlabel<-links_taux3%>%
+  mutate_if(is.numeric, round, 2)
+colrs <-c("blue","red","red","blue","blue","blue","red","red",
+          "blue","blue","blue","blue","blue") 
+
+png("./Figures/Networks/networkdiagramtau3.png",units="in",width=6,height=6,res=300)
+plot(net,vertex.size=25,edge.color=colrs,vertex.label.color="black",vertex.label.cex=0.4,vertex.color="lightgray",
+     layout=l,edge.label.cex=0.5,edge.label.color=colrs,edge.label=links_tauxlabel$weight,vertex.label.family="Arial",
+     edge.lty=3,edge.width=0.7,edge.label.font=2,edge.label.family="Arial",vertex.label.font=2)#pt.bg=colrs ,edge.width=E(net)$weight
 dev.off()
 
