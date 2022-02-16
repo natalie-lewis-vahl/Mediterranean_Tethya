@@ -26,7 +26,9 @@ filtered[filtered==""]<-"Unclassified"
 
 plot1data<-filtered%>%
   dplyr::count(Phylum)
-
+View(plot1data2)
+plot1data2<-filtered%>%
+  dplyr::count(Phylum,Class)
 #The large amount of otus belonging to unclassified makes other phyla harder
 #to differentiate - could represent same phyla or lots of different ones
 #remove 9215 unknown OTUs 
@@ -38,12 +40,19 @@ filtered<-filtered[!(filtered$Phylum=="Unclassified"),]
 data<-plot1data$n
 names(data)<-plot1data$Phylum
 barplot(data)
-
+View(data)
 counts<-table(filtered$Class,filtered$Phylum)
+View(counts)
 png("./Figures/18splots/overall18s_taxa_distribution.png",units="in", width=15, height=5, res=300)
 barplot(counts,xlab="Phyla",ylab="Number of OTUs",cex.names= 0.5,ylim=c(0,25))
 dev.off()
-
+##for class
+counts2<-table(filtered$Class)
+png("./Figures/18splots/overall18s_class_distribution.png",units="in", width=15, height=5, res=300)
+barplot(counts2,xlab="Class",ylab="Number of OTUs",cex.names= 0.5)
+dev.off()
+View(counts2)
+dim(counts2)
 #using ggplot
 #Arrange table for this and order to have nice plot
 head(plot1data)

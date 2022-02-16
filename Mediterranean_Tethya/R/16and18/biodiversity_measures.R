@@ -47,6 +47,7 @@ data_16<-data_all[data_all$dataset=="16s",]
 head(data_16)
 dim(data_16)
 data_16<-data_16[,-45]
+
 #just 18s
 data_18<-data_all[data_all$dataset=="18s",]
 dim(data_18)
@@ -87,38 +88,41 @@ data_18<-data_18[,-c(1,2,47:55)]
 data_16<-as.matrix(t(data_16))
 H<-diversity(data_16)
 richness<-specnumber(data_16)
+richness
 species<-c("Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tau","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tme","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tci","Tme","Tme","Tau")
 spcols<-c("green","green","green","green","green","green","green","green","green","green","green","red","red","red","red","red","red","red","red","red","red","red","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","darkblue","red","red","green")
 evenness<-H/log(richness)#Peilous richness
+print(richness)
 alpha<-cbind(shannon=H, richness=richness, pielou=evenness,species)
 alpha<-as.data.frame(alpha)
 str(alpha)
 alpha$shannon<-as.numeric(alpha$shannon)
 alpha$richness<-as.numeric(alpha$richness)
 alpha$pielou<-as.numeric(alpha$pielou)
-
+alpha
+library(ggrepel)
 shanplot16<-ggplot(alpha,aes(species,shannon,colour=spcols))+
-  geom_point()+
+  geom_point()+geom_text(aes(label=rownames(alpha)),hjust=-0.3,size=1,col="black")+
   ylab("Shannon's H'") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 richplot16<-ggplot(alpha,aes(species,richness,colour=spcols))+
-  geom_point()+
+  geom_point()+geom_text(aes(label=rownames(alpha)),hjust=-0.3, vjust=0,size=1,col="black")+
   ylab("Species richness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 pielouplot16<-ggplot(alpha,aes(species,pielou,colour=spcols))+
-  geom_point()+
+  geom_point()+geom_text(aes(label=rownames(alpha)),hjust=-0.3, vjust=0,size=1,col="black")+
   ylab("Pielou's evenness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
-png("Figures/AS_16splots/alphadivplots16s.png",units="cm",width=30,height=10,res=300)
+png("Figures/AS_16splots/alphadivplots16s.png",units="cm",width=30,height=12,res=300)
 plot_grid(shanplot16,richplot16,pielouplot16,ncol=3)
 dev.off()
 #For 18s data
@@ -135,27 +139,27 @@ alpha18$richness<-as.numeric(alpha18$richness)
 alpha18$pielou<-as.numeric(alpha18$pielou)
 
 shanplot18<-ggplot(alpha18,aes(species,shannon,colour=spcols))+
-  geom_point()+
+  geom_point()+geom_text(aes(label=rownames(alpha18)),hjust=-0.3, vjust=0,size=1,col="black")+
   ylab("Shannon's H'") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 richplot18<-ggplot(alpha18,aes(species,richness,colour=spcols))+
-  geom_point()+
+  geom_point()+geom_text(aes(label=rownames(alpha18)),hjust=-0.3, vjust=0,size=1,col="black")+
   ylab("Species richness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
 pielouplot18<-ggplot(alpha18,aes(species,pielou,colour=spcols))+
-  geom_point()+
+  geom_point()+geom_text(aes(label=rownames(alpha18)),hjust=-0.3, vjust=0,size=1,col="black")+
   ylab("Pielou's evenness") + 
   xlab("" )+
   theme_bw() +
   theme(legend.position = "none")+
   scale_x_discrete(labels=c("Tau"="T.aurantium","Tme"="T.meloni","Tci"="T.citrina"))
-png("Figures/18splots/alphadivplots18s.png",units="cm",width=30,height=10,res=300)
+png("Figures/18splots/alphadivplots18s.png",units="cm",width=30,height=12,res=300)
 plot_grid(shanplot18,richplot18,pielouplot18,ncol=3)
 dev.off()
 ####For 18 and 16 merged

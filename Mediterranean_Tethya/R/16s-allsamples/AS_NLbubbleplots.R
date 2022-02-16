@@ -36,7 +36,7 @@ ggplot(bubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
                               LatescibacterotaCol,MyxococcotaCol,NB1jCol,NitrospinotaCol,NitrospirotaCol,
                               PlanctomycetotaCol,ProteobacteriaCol,SAR324cladeCol,SpirochaetotaCol,
                               UnclassifiedCol,VerrucomicrobiotaCol))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
-  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+
+  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethya meloni","Tethia citrina"))+
   theme(axis.text.x = element_text(face = "italic"),legend.margin = margin(0,0,0,-2))+
   guides(color = guide_legend(override.aes = list(size = 5),ncol=2),size=guide_legend(nrow=1) )
 
@@ -71,7 +71,7 @@ ggplot(corebubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abundance))+
                               NitrospirotaCol,
                               PlanctomycetotaCol,ProteobacteriaCol,
                               UnclassifiedCol,VerrucomicrobiotaCol))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
-  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+
+  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethya meloni","Tethia citrina"))+
   theme(axis.text.x = element_text(face = "italic"),legend.margin = margin(0,0,0,-2))+
   guides(color = guide_legend(override.aes = list(size = 5),ncol=2),size=guide_legend(nrow=1) )
 
@@ -87,7 +87,7 @@ fullbubble<-ggplot(bubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abunda
                               LatescibacterotaCol,MyxococcotaCol,NB1jCol,NitrospinotaCol,NitrospirotaCol,
                               PlanctomycetotaCol,ProteobacteriaCol,SAR324cladeCol,SpirochaetotaCol,
                               UnclassifiedCol,VerrucomicrobiotaCol))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
-  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+
+  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethya meloni","Tethia citrina"))+
   theme(axis.text.x = element_text(face = "italic"),legend.margin = margin(0,0,0,-2))+
   guides(color = guide_legend(override.aes = list(size = 5),ncol=2),size=guide_legend(nrow=1) )
 
@@ -102,7 +102,7 @@ fullbubble2<-ggplot(bubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=abund
                               UnclassifiedCol,VerrucomicrobiotaCol))+
   labs(x="Species",y="Phylum Richness",size="Relative abundance")+
   scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+
-  scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ 
+  scale_x_discrete(labels=c("Tethya aurantium","Tethya meloni","Tethia citrina"))+ 
   theme(axis.text.x = element_text(face = "italic"),legend.position = ("none"))+
   ggtitle("Including all OTUs")
 
@@ -113,7 +113,7 @@ corebubble2<-ggplot(corebubbledata,aes(x=variable,y=Numb_otu,color=Phylum,size=a
                               NitrospirotaCol,
                               PlanctomycetotaCol,ProteobacteriaCol,
                               UnclassifiedCol,VerrucomicrobiotaCol))+labs(x="Species",y="Phylum Richness",size="Relative abundance")+
-  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+ theme(axis.text.x = element_text(face = "italic"),legend.position = "none")+
+  scale_size(range = c(.9,15))+theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethya meloni","Tethia citrina"))+ theme(axis.text.x = element_text(face = "italic"),legend.position = "none")+
   ggtitle("Including only Core OTUs")
 png("Figures/AS_16splots/bubbleplots16s.png",width=11,height=5,units="in",res=300)
 grid.arrange(fullbubble2,corebubble2,legend,nrow=1)
@@ -162,7 +162,7 @@ ggplot(dataset,aes(x=variable,y=relative_abundance,color=Phylum))+
                               LatescibacterotaCol,MyxococcotaCol,NB1jCol,NitrospinotaCol,NitrospirotaCol,
                               PlanctomycetotaCol,ProteobacteriaCol,SAR324cladeCol,SpirochaetotaCol,
                               UnclassifiedCol,VerrucomicrobiotaCol))+labs(x="Species",y="Relative abundance")+
-  theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+
+  theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethya meloni","Tethia citrina"))+
   theme(axis.text.x = element_text(face = "italic"),legend.margin = margin(0,0,0,-2))+
   guides(color = guide_legend(override.aes = list(size = 5),ncol=2),size=guide_legend(nrow=1) )
 
@@ -179,7 +179,7 @@ ggplot(bubbledata,aes(x=variable,y=abundance/Numb_otu,color=Phylum))+
                               LatescibacterotaCol,MyxococcotaCol,NB1jCol,NitrospinotaCol,NitrospirotaCol,
                               PlanctomycetotaCol,ProteobacteriaCol,SAR324cladeCol,SpirochaetotaCol,
                               UnclassifiedCol,VerrucomicrobiotaCol))+labs(x="Species",y="Relative abundance/Phylum richness")+
-  theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethia citrina","Tethya meloni"))+
+  theme_bw()+geom_jitter(width=0.3,alpha=0.9)+scale_x_discrete(labels=c("Tethya aurantium","Tethya meloni","Tethia citrina"))+
   theme(axis.text.x = element_text(face = "italic"),legend.margin = margin(0,0,0,-2))+
   guides(color = guide_legend(override.aes = list(size = 5),ncol=2),size=guide_legend(nrow=1) )
 
