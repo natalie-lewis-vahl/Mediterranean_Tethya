@@ -180,9 +180,10 @@ datatci<-plot4data %>%
   mutate(Phylum=factor(Phylum, levels=Phylum))
 
 ##########
-tiff("./Figures/AS_16splots/tci16s_taxa_distribution2.tiff",units="in", width=10, height=8, res=300)
+
+png("./Figures/AS_16splots/tci16s_taxa_distribution5.png",units="in", width=8, height=5.8, res=300)
 ggplot(datatci,aes(x=Phylum,y=n,fill=Phylum))+
-  geom_bar(stat="identity")+scale_y_continuous(limits=c(0,150),expand=c(0,0),minor_breaks = seq(0 , 175, 5), breaks = seq(0, 175, 50))+
+  geom_bar(stat="identity")+scale_y_continuous(limits=c(0,150),expand=c(0,0),minor_breaks = seq(0 , 175, 5), breaks = seq(0, 175, 10))+
   scale_fill_manual(values = c(ProteobacteriaCol,UnclassifiedCol,PlanctomycetotaCol,BacteroidotaCol,
                                DesulfobacterotaCol,ActinobacteriotaCol,AcidobacteriotaCol,VerrucomicrobiotaCol,
                                MyxococcotaCol,NitrospirotaCol,CyanobacteriaCol,DeferrisomatotaCol,NB1jCol,        
@@ -190,10 +191,8 @@ ggplot(datatci,aes(x=Phylum,y=n,fill=Phylum))+
                                GemmatimonadotaCol,CalditrichotaCol,DeinococcotaCol,LatescibacterotaCol,
                                NitrospinotaCol,SAR324cladeCol)) +
   labs(x="Phylum",y="Number of OTUs")+
+  coord_flip()+
   ggtitle(expression(italic("Tethya citrina")))+
-  theme_bw() + theme(axis.text.x=element_text(angle=90,hjust=0.8,size=9),legend.position="none")+
-  theme(text=element_text(size=10),axis.title.x=element_text(vjust=3),panel.grid.major.x = element_blank(),panel.grid.major.y = element_line( size=.1, color="grey30" ))
-
-
+  geom_text(aes(label=Phylum),hjust=0,size=4)+ theme_bw()+
+  theme(plot.title=element_text(hjust=0.5,size=18),axis.text.x = element_text(size=12),axis.title.x = element_text(size=16),axis.title.y = element_text(size=16),legend.position="none",axis.text.y=element_blank(),axis.ticks.y=element_blank(),panel.grid.major.y = element_blank(),panel.grid.major.x = element_line( size=.1, color="grey30" ))
 dev.off()
-
